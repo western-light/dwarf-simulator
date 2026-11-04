@@ -6,6 +6,7 @@
     "com.unity.inputsystem": "1.20.1",
     "com.unity.render-pipelines.universal": "17.6.0",
     "com.unity.ugui": "2.6.0",
+    "dev.purrnet.purrnet": "https://github.com/PurrNet/PurrNet.git?path=/Assets/PurrNet#release",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
@@ -41,6 +42,8 @@
     "com.unity.modules.vehicles": "1.0.0",
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "dev.purrnet.ui": "https://github.com/PurrNet/PurrUI.git?path=Assets/PurrUI#v1.6.0",
+    "dev.purrnet.eostransport": "https://github.com/PurrNet/PurrNetEOSTransport.git?path=/Assets/EOSTransport#v1.0.0"
   }
 }
