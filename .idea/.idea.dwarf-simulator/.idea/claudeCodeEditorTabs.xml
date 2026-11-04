@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ClaudeCodeEditorTabs">
+    <option name="activeSessionId" value="06c39082-5c13-45d7-8f22-a9559c56e307" />
+    <option name="openSessionIds">
+      <list>
+        <option value="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" />
+        <option value="06c39082-5c13-45d7-8f22-a9559c56e307" />
+      </list>
+    </option>
+    <option name="sessionPaths">
+      <map>
+        <entry key="06c39082-5c13-45d7-8f22-a9559c56e307" value="/sessions/a0e2bd06-936c-4422-9910-7774bec5bc1d" />
+        <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="/sessions/new" />
+      </map>
+    </option>
+    <option name="sessionTitles">
+      <map>
+        <entry key="06c39082-5c13-45d7-8f22-a9559c56e307" value="Setup lobby eos avec purrlobbY" />
+        <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="Claude Code" />
+      </map>
+    </option>
+  </component>
+</project>

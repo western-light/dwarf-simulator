@@ -135,3 +135,8 @@ crashlytics-build.properties
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# EOS (Epic Online Services): contains client credentials, do not commit
+/[Aa]ssets/StreamingAssets/EOS/eos_*_config.json
+/[Aa]ssets/StreamingAssets/EOS/eos_*_config.json.meta
+/etc/config/

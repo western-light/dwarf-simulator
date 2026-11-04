@@ -796,7 +796,25 @@ PlayerSettings:
   webWasm2023: 1
   webEnableSubmoduleStrippingCompatibility: 0
   webProgressiveAssetLoading: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: DOTWEEN;DOTWEENPRO
+    EmbeddedLinux: DOTWEEN;DOTWEENPRO
+    GameCoreScarlett: DOTWEEN;DOTWEENPRO
+    GameCoreXboxOne: DOTWEEN;DOTWEENPRO
+    Kepler: DOTWEEN;DOTWEENPRO
+    LinuxHeadlessSimulation: DOTWEEN;DOTWEENPRO
+    Nintendo Switch: DOTWEEN;DOTWEENPRO
+    Nintendo Switch 2: DOTWEEN;DOTWEENPRO
+    PS4: DOTWEEN;DOTWEENPRO
+    PS5: DOTWEEN;DOTWEENPRO
+    QNX: DOTWEEN;DOTWEENPRO
+    Standalone: DOTWEEN;DOTWEENPRO
+    VisionOS: DOTWEEN;DOTWEENPRO
+    WebGL: DOTWEEN;DOTWEENPRO
+    Windows Store Apps: DOTWEEN;DOTWEENPRO
+    XboxOne: DOTWEEN;DOTWEENPRO
+    iPhone: DOTWEEN;DOTWEENPRO
+    tvOS: DOTWEEN;DOTWEENPRO
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
