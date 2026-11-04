@@ -18,4 +18,8 @@ MonoBehaviour:
   folder: {fileID: 102900000, guid: 00000000000000001000000000000000, type: 3}
   searchAllIfNoFolder: 1
   linkedNetworkPrefabs: []
-  prefabs: []
+  prefabs:
+  - guid: 626feab9fefdec914ace6665eadbb834
+    prefab: {fileID: 3261272837464816574, guid: 626feab9fefdec914ace6665eadbb834, type: 3}
+    pooled: 0
+    warmupCount: 5
