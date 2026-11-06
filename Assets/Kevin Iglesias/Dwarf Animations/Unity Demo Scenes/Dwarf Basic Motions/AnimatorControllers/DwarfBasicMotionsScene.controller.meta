@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2f9152924720ea34db8ed80cc6ba238c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 388254
+  packageName: Dwarf Basic Motions
+  packageVersion: 1.0
+  assetPath: Assets/Kevin Iglesias/Dwarf Animations/Unity Demo Scenes/Dwarf Basic Motions/AnimatorControllers/DwarfBasicMotionsScene.controller
+  uploadId: 939010

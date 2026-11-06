@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: bcb76aa481d89e44cbedc828044e6cbc
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 388254
+  packageName: Dwarf Basic Motions
+  packageVersion: 1.0
+  assetPath: Assets/Kevin Iglesias/Dwarf Animations/Unity Demo Scenes/Dwarf Basic Motions/Shaders/DwarfBasicMotionsScene.shader
+  uploadId: 939010
