@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.072948806
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.000000113459464
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.3436313
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -144,6 +144,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4172652445073310332}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -4205377798153715687}
   m_SourcePrefab: {fileID: 100100000, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
 --- !u!1 &1009215913774552843 stripped
 GameObject:
@@ -245,4 +248,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PlayerMouvement
   moveSpeed: 2
-  jumpSpeed: 1
+  jumpHeight: 20
+--- !u!114 &-4205377798153715687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009215913774552843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d5e4b97b1615f4aae984a3d5f4235f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkOwnershipToggle
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _components:
+  - target: {fileID: 4172652445073310332}
+    activeAsOwner: 1
+  _gameObjects: []
+  _applyInLateUpdate: 0
+  _toActivate: []
+  _toDeactivate: []
+  _toEnable: []
+  _toDisable: []
