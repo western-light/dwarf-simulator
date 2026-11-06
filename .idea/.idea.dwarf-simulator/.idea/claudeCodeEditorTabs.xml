@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="8e792c49-74f1-4042-8497-de9204b88fb7" />
+    <option name="activeSessionId" value="ff6636ed-e61e-47fe-afc9-9fb2cebd5a1c" />
     <option name="openSessionIds">
       <list>
         <option value="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" />
         <option value="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" />
-        <option value="8e792c49-74f1-4042-8497-de9204b88fb7" />
+        <option value="ff6636ed-e61e-47fe-afc9-9fb2cebd5a1c" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="/sessions/f16326b4-d35b-4193-99bd-329bcbf308ba" />
-        <entry key="8e792c49-74f1-4042-8497-de9204b88fb7" value="/sessions/b2a6acbb-3a69-4e32-98db-4bdd95fefb16" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="/sessions/new" />
+        <entry key="ff6636ed-e61e-47fe-afc9-9fb2cebd5a1c" value="/sessions/83234472-110a-4b9c-8e7e-f64bb008ae21" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="Fonctionnement asmdef" />
-        <entry key="8e792c49-74f1-4042-8497-de9204b88fb7" value="Système de déplacement du joueur" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="Claude Code" />
+        <entry key="ff6636ed-e61e-47fe-afc9-9fb2cebd5a1c" value="Saut conditionné au contact du sol" />
       </map>
     </option>
   </component>

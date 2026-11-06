@@ -133,6 +133,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: -4205377798153715687}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 5806125661984067653}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7753205414447776636}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
@@ -144,15 +150,71 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4172652445073310332}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -4205377798153715687}
   m_SourcePrefab: {fileID: 100100000, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
 --- !u!1 &1009215913774552843 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
   m_PrefabInstance: {fileID: 198190643879160410}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &-4205377798153715687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009215913774552843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d5e4b97b1615f4aae984a3d5f4235f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkOwnershipToggle
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _components:
+  - target: {fileID: 4172652445073310332}
+    activeAsOwner: 1
+  _gameObjects: []
+  _applyInLateUpdate: 0
+  _toActivate: []
+  _toDeactivate: []
+  _toEnable: []
+  _toDisable: []
+--- !u!114 &5806125661984067653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009215913774552843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7b598b9d8509d64abb9fdaf07fa3f6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkAnimator
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _animator: {fileID: 6028781679281805259}
+  _ownerAuth: 1
+  _autoSyncParameters: 1
+  _dontSyncParameters: []
 --- !u!65 &7753205414447776636
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -248,36 +310,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PlayerMouvement
   moveSpeed: 2
-  jumpHeight: 20
---- !u!114 &-4205377798153715687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  jumpForce: 5
+--- !u!95 &6028781679281805259 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
+  m_PrefabInstance: {fileID: 198190643879160410}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009215913774552843}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39d5e4b97b1615f4aae984a3d5f4235f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkOwnershipToggle
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _isSetup: 0
-  _prefabId: -2147483648
-  _hasPrefabScope: 0
-  _prefabScope: 0
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
-  _components:
-  - target: {fileID: 4172652445073310332}
-    activeAsOwner: 1
-  _gameObjects: []
-  _applyInLateUpdate: 0
-  _toActivate: []
-  _toDeactivate: []
-  _toEnable: []
-  _toDisable: []
