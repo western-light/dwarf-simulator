@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="5c4ae61f-71d6-408a-a90c-5ac67634f867" />
+    <option name="activeSessionId" value="b9b2db94-5a73-4c9b-92a5-f496ecb3a5bd" />
     <option name="openSessionIds">
       <list>
         <option value="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" />
         <option value="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" />
-        <option value="ccd95019-3f5d-43eb-8de7-51e7b5ff2e7d" />
-        <option value="5c4ae61f-71d6-408a-a90c-5ac67634f867" />
+        <option value="b9b2db94-5a73-4c9b-92a5-f496ecb3a5bd" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
-        <entry key="5c4ae61f-71d6-408a-a90c-5ac67634f867" value="/sessions/9f2aedcf-f0ba-4bcd-9c5a-239cd1fb7de4" />
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="/sessions/f16326b4-d35b-4193-99bd-329bcbf308ba" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="/sessions/new" />
-        <entry key="ccd95019-3f5d-43eb-8de7-51e7b5ff2e7d" value="/sessions/ee29e980-e576-4adb-ac8e-7fa243998aa2" />
+        <entry key="b9b2db94-5a73-4c9b-92a5-f496ecb3a5bd" value="/sessions/6a4271e2-7acc-4de9-8209-c549851ed4c4" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
-        <entry key="5c4ae61f-71d6-408a-a90c-5ac67634f867" value="Caméra Cinemachine suivi joueur et souris" />
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="Fonctionnement asmdef" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="Claude Code" />
-        <entry key="ccd95019-3f5d-43eb-8de7-51e7b5ff2e7d" value="OnSpawned de CameraSync non appelé" />
+        <entry key="b9b2db94-5a73-4c9b-92a5-f496ecb3a5bd" value="Touche v ne fonctionne plus" />
       </map>
     </option>
   </component>
