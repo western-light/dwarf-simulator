@@ -11,11 +11,17 @@ namespace DwarfSimulator.Player
 
         private CinemachineCamera[] playerCameras;
         private InputAction toggleViewAction;
-
-        // playerCameras is only set for the local player, so remote players never react to the key.
+        
+        
         private void Update()
         {
-            if (playerCameras == null || !toggleViewAction.WasPressedThisFrame())
+            if (!isOwner)
+                return;
+
+            if (playerCameras == null)
+                Follow();
+
+            if (!toggleViewAction.WasPressedThisFrame())
                 return;
 
             foreach (CinemachineCamera playerCamera in playerCameras)
@@ -28,17 +34,6 @@ namespace DwarfSimulator.Player
             }
         }
 
-        protected override void OnSpawned()
-        {
-            FollowIfOwner();
-        }
-
-        // PlayerSpawner gives ownership after the spawn, so isOwner can still be false in OnSpawned.
-        protected override void OnOwnerChanged(PlayerID? oldOwner, PlayerID? newOwner, bool asServer)
-        {
-            FollowIfOwner();
-        }
-
         protected override void OnDespawned()
         {
             if (playerCameras == null)
@@ -49,17 +44,12 @@ namespace DwarfSimulator.Player
             Cursor.visible = true;
         }
 
-        private void FollowIfOwner()
+        private void Follow()
         {
-            if (!isOwner)
-                return;
-
-            // Both views stay enabled and read the mouse, so they keep looking the same way.
             playerCameras = FindObjectsByType<CinemachineCamera>();
             foreach (CinemachineCamera playerCamera in playerCameras)
                 playerCamera.Target.TrackingTarget = cameraPos;
 
-            // Start in first person.
             FindAnyObjectByType<CinemachinePanTilt>().VirtualCamera.Prioritize();
 
             toggleViewAction = InputSystem.actions.FindAction("ToggleView");
