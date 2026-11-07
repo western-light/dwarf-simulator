@@ -1,11 +1,13 @@
 {
   "dependencies": {
     "com.playeveryware.eos": "https://github.com/Western-Light/eos_plugin_for_unity_upm.git#v6.1.0-neon",
+    "com.unity.cinemachine": "6.6.0",
     "com.unity.collab-proxy": "2.13.6",
     "com.unity.ide.rider": "3.1.0",
     "com.unity.ide.visualstudio": "2.0.29",
     "com.unity.inputsystem": "1.20.1",
     "com.unity.render-pipelines.universal": "17.6.0",
+    "com.unity.timeline": "6.6.0",
     "com.unity.ugui": "2.6.0",
     "dev.purrnet.eostransport": "https://github.com/PurrNet/PurrNetEOSTransport.git?path=/Assets/EOSTransport#v1.0.0",
     "dev.purrnet.purrnet": "https://github.com/PurrNet/PurrNet.git?path=/Assets/PurrNet#release",
