@@ -17,6 +17,8 @@ namespace DwarfSimulator.Player
         private Rigidbody rb;
         private Animator anim;
         private Collider col;
+        
+        private Vector3 lastMoveDirection;
 
         void Start()
         {
@@ -33,6 +35,8 @@ namespace DwarfSimulator.Player
         {
             Vector2 moveInput = moveAction.ReadValue<Vector2>();
             Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+            if (moveDirection.magnitude > 0.1f)
+                lastMoveDirection = moveDirection;
             bool run = runAction.IsPressed();
             float speed = run ? runSpeed : moveSpeed;
             
@@ -40,7 +44,7 @@ namespace DwarfSimulator.Player
             anim.SetBool("Run", run);
             
             rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            Quaternion targetRotation = Quaternion.LookRotation(lastMoveDirection);
             rb.MoveRotation(targetRotation);
             
             if (jumpAction.IsPressed() && IsGrounded())
