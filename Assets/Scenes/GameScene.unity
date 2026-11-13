@@ -731,7 +731,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 60.000004
+  field of view: 40
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -757,8 +757,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.04287337, y: 0.7727136, z: -0.05246958, w: -0.631128}
-  m_LocalPosition: {x: 19.417267, y: 2.7041018, z: 3.9569774}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1084,8 +1084,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Interactor.InteractorUI
   interactButtonPrefab: {fileID: 6420314528350420660, guid: b9bc37dedb097e81c9aa0ce811a0b880, type: 3}
-  interactUI: {fileID: 215822618}
-  interactUITransform: {fileID: 0}
+  interactUI: {fileID: 1858648118}
+  interactUITransform: {fileID: 215822619}
 --- !u!1 &1058843092
 GameObject:
   m_ObjectHideFlags: 0

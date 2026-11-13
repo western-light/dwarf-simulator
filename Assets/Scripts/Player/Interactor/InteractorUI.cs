@@ -11,6 +11,7 @@ namespace DwarfSimulator.Player.Interactor
         
         private Camera _cam;
         private Choice[] _choices;
+        private GameObject[] _choiceObjects;
         
         private void Awake()
         {
@@ -31,11 +32,16 @@ namespace DwarfSimulator.Player.Interactor
 
         public void Interact(Choice[] choices)
         {
+            if (_choices != null) return;
+            
             _choices = choices;
             interactUI.SetActive(true);
-            foreach (Choice choice in _choices)
+            _choiceObjects = new GameObject[_choices.Length];
+            for (int i = 0; i < _choices.Length; i++)
             {
-                Instantiate(interactButtonPrefab, interactUITransform);
+                GameObject button = Instantiate(interactButtonPrefab, interactUITransform);
+                _choiceObjects[i] = button;
+                
             }
         }
 
@@ -43,6 +49,10 @@ namespace DwarfSimulator.Player.Interactor
         {
             _choices = null;
             interactUI.SetActive(false);
+            for (int i = 0; i < _choiceObjects.Length; i++)
+            {
+                Destroy(_choiceObjects[i]);
+            }
         }
     }
 }
