@@ -1,10 +1,6 @@
-using System;
 using PurrNet;
-using Unity.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
-using Color = System.Drawing.Color;
 
 namespace DwarfSimulator.Player.Interactor
 {
@@ -27,8 +23,8 @@ namespace DwarfSimulator.Player.Interactor
     public class Choice
     {
         public string Name;
-        public Image Icon;
+        public Sprite Icon;
         public Color Color;
-        public UnityEvent OnInteract;
+        public Button.ButtonClickedEvent OnInteract;
     }
 }
