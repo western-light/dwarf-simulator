@@ -17,14 +17,17 @@ namespace DwarfSimulator.Player
         private Rigidbody rb;
         private Animator anim;
         private Collider col;
+        private Transform playerCamera;
         
         private Vector3 lastMoveDirection;
+        private bool freeze;
 
         void Start()
         {
             rb = GetComponent<Rigidbody>();
             col = GetComponent<Collider>();
             anim = GetComponent<Animator>();
+            playerCamera = Camera.main.transform;
             moveAction = InputSystem.actions.FindAction("Move");
             runAction = InputSystem.actions.FindAction("Sprint");
             jumpAction = InputSystem.actions.FindAction("Jump");
@@ -33,8 +36,12 @@ namespace DwarfSimulator.Player
 
         void FixedUpdate()
         {
+            if (freeze) return;
+            
             Vector2 moveInput = moveAction.ReadValue<Vector2>();
-            Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+            Vector3 cameraForward = Vector3.ProjectOnPlane(playerCamera.forward, Vector3.up).normalized;
+            Vector3 cameraRight = Vector3.ProjectOnPlane(playerCamera.right, Vector3.up).normalized;
+            Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
             if (moveDirection.magnitude > 0.1f)
                 lastMoveDirection = moveDirection;
             bool run = runAction.IsPressed();
@@ -60,5 +67,8 @@ namespace DwarfSimulator.Player
             return Physics.Raycast(bounds.center, Vector3.down, bounds.extents.y + GroundCheckMargin,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         }
+        
+        public void Freeze() => freeze = true;
+        public void UnFreeze() => freeze = false;
     }
 }
