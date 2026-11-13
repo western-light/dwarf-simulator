@@ -15,6 +15,8 @@ namespace DwarfSimulator.Lobby
         public const string LOBBY_STATUS_DETAILS_STRING = "LOBBY_STATUS_DETAILS_STRING";
         public const string LOBBY_CONN_INFO = GameStartKeys.ConnInfo;
 
+        [SerializeField] private int _minPlayerCount = 2;
+        [Space]
 
         [SerializeField] private List<GameObject> _rocks;
         [SerializeField] private GameObject _prefabPerso;
@@ -49,6 +51,8 @@ namespace DwarfSimulator.Lobby
         private bool _lobbyEventsUnsubscribed;
 
         private GameOrchestrator _orchestrator;
+
+        public ILobby lobby => _lobby;
 
 #if PURR_VOICE
         public bool localMicEnabled => _hasLocalMicEnabled;
@@ -185,6 +189,20 @@ namespace DwarfSimulator.Lobby
             // }
         }
 
+        public void ButtonStartGame()
+        {
+            if (_lobby.players.Count > _minPlayerCount)
+            {
+                _gameStarted = true;
+
+                _lobbyStatusDetails.text = $"LOADING ...";
+                _lobby.lobbyData.SetData(LOBBY_STATUS_DETAILS_STRING, _lobbyStatusDetails.text);
+
+                StartGame();
+                return;
+            }
+        }
+
         public void CopyLobbyCodeToClipboard()
         {
             GUIUtility.systemCopyBuffer = _lobby.joinCode;
@@ -288,19 +306,75 @@ namespace DwarfSimulator.Lobby
             }
         }
 
+        private void StartGame()
+        {
+            LaunchGame(async loadingView =>
+            {
+                var joinInfo = await _orchestrator.gameAllocator.AllocateGame(lobby);
+                if (!this || _lobby == null)
+                    return;
+
+                if (!joinInfo.success)
+                    throw new Exception(joinInfo.error);
+
+                GameStartKeys.PublishConnectionInfo(_lobby, joinInfo.connection);
+
+                // TODO :
+                // loadingView.Setup("Loading game ...");
+                var orchestrator = _orchestrator;
+                await orchestrator.gameAllocator.LoadGame(lobby);
+                orchestrator.gameAllocator.Connect(joinInfo.connection, true);
+            }).Forget("[LobbyView] StartGame failed");
+        }
+
         private void JoinGame(string rawConnectionInfo)
         {
-            // TODO :
-            // LaunchGame(async loadingView =>
-            // {
-            //     if (!GameStartKeys.TryReadConnectionInfo(rawConnectionInfo, out var info))
-            //         throw new Exception("Received malformed connection info from the lobby.");
+            LaunchGame(async loadingView =>
+            {
+                if (!GameStartKeys.TryReadConnectionInfo(rawConnectionInfo, out var info))
+                    throw new Exception("Received malformed connection info from the lobby.");
 
-            //     loadingView.Setup("Loading game ...");
-            //     var orchestrator = _orchestrator;
-            //     await orchestrator.gameAllocator.LoadGame(lobby);
-            //     orchestrator.gameAllocator.Connect(info, false);
-            // }).Forget("[LobbyView] JoinGame failed");
+                // TODO :
+                // loadingView.Setup("Loading game ...");
+                var orchestrator = _orchestrator;
+                await orchestrator.gameAllocator.LoadGame(lobby);
+                orchestrator.gameAllocator.Connect(info, false);
+            }).Forget("[LobbyView] JoinGame failed");
+        }
+
+        private async Task LaunchGame(Func<LoadingView, Task> flow)
+        {
+            LoadingView loadingView = null;
+
+            // TODO : Add loading screen
+            try
+            {
+                // loadingView = parentStack.Push<LoadingView>();
+                // loadingView.Setup("Allocating game ...");
+
+                await flow(loadingView);
+            }
+            catch (Exception e)
+            {
+                Toaster.PushError("Failed to start game", e);
+                Debug.LogError("Failed to start game");
+                Debug.LogException(e, _orchestrator.gameAllocator);
+                ResetStartState();
+            }
+            finally
+            {
+                // if (loadingView)
+                //     loadingView.PopMe();
+            }
+        }
+
+        private void ResetStartState()
+        {
+            ResetStatusLabels();
+            _wasAllReady = false;
+            _gameStarted = false;
+            _allReadyTimer = _timeToStartGame;
+            // _lobby?.localPlayer?.SetReady(false);
         }
 
         private void OnLobbyDestroyed()
