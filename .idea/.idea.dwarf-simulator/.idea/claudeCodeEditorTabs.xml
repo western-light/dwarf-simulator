@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="ad3f45f3-60d3-4a7d-8516-0f61a784f05d" />
+    <option name="activeSessionId" value="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" />
     <option name="openSessionIds">
       <list>
         <option value="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" />
         <option value="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" />
-        <option value="ad3f45f3-60d3-4a7d-8516-0f61a784f05d" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="/sessions/f16326b4-d35b-4193-99bd-329bcbf308ba" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="/sessions/new" />
-        <entry key="ad3f45f3-60d3-4a7d-8516-0f61a784f05d" value="/sessions/bbebecb9-7140-44f7-99cb-75742d5e8c6c" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="Fonctionnement asmdef" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="Claude Code" />
-        <entry key="ad3f45f3-60d3-4a7d-8516-0f61a784f05d" value="Matériaux Cicada vers Lit" />
       </map>
     </option>
   </component>
