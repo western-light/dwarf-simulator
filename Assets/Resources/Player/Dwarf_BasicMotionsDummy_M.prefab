@@ -168,9 +168,12 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: 1
-      addedObject: {fileID: -4205377798153715687}
+      addedObject: {fileID: 4834778337949026700}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: 2
+      addedObject: {fileID: -4205377798153715687}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
+      insertIndex: 3
       addedObject: {fileID: 5806125661984067653}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
       insertIndex: -1
@@ -201,6 +204,29 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4e3a73173894103408601bcd15dcbdcb, type: 3}
   m_PrefabInstance: {fileID: 198190643879160410}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4834778337949026700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009215913774552843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a023d73572b646cf8e6f0d570384ac4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Player
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
 --- !u!114 &-4205377798153715687
 MonoBehaviour:
   m_ObjectHideFlags: 0

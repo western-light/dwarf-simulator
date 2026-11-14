@@ -1,22 +1,14 @@
 using PurrNet;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
 
 namespace DwarfSimulator.Player.Interactor
 {
     public class Interactable : NetworkIdentity
     {
         [SerializeField] private Choice[] choices;
-        
-        public void Interact()
-        {
-            FindAnyObjectByType<InteractorUI>().Interact(choices);
-        }
 
-        public void StopInteract()
-        {
-            FindAnyObjectByType<InteractorUI>().StopInteract();
-        }
+        public Choice[] Choices => choices;
     }
 
     [System.Serializable]
@@ -25,7 +17,7 @@ namespace DwarfSimulator.Player.Interactor
         public string Name;
         public Sprite Icon;
         public Color Color;
-        public Button.ButtonClickedEvent OnInteract;
+        public UnityEvent<Player> OnInteract;
         public bool Default;
     }
 }

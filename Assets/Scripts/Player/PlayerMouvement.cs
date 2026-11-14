@@ -21,6 +21,7 @@ namespace DwarfSimulator.Player
         
         private Vector3 lastMoveDirection;
         private bool freeze;
+        private bool interactionFrozen;
 
         void Start()
         {
@@ -36,7 +37,7 @@ namespace DwarfSimulator.Player
 
         void FixedUpdate()
         {
-            if (freeze) return;
+            if (freeze || interactionFrozen) return;
             
             Vector2 moveInput = moveAction.ReadValue<Vector2>();
             Vector3 cameraForward = Vector3.ProjectOnPlane(playerCamera.forward, Vector3.up).normalized;
@@ -69,6 +70,14 @@ namespace DwarfSimulator.Player
         }
         
         public void Freeze() => freeze = true;
+        public void SetInteractionFrozen(bool value) => interactionFrozen = value;
+        public void Freeze(Vector3 position, Quaternion rotation)
+        {
+            freeze = true;
+            lastMoveDirection = new Vector3(0, 0, 0);
+            transform.position = position;
+            transform.rotation = rotation;
+        }
         public void UnFreeze() => freeze = false;
     }
 }

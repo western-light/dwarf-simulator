@@ -731,7 +731,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 40
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -757,8 +757,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.2}
+  m_LocalRotation: {x: -0.04287337, y: 0.7727136, z: -0.05246958, w: -0.631128}
+  m_LocalPosition: {x: 19.417267, y: 2.7041018, z: 3.9569774}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1060,7 +1060,7 @@ RectTransform:
   m_GameObject: {fileID: 696424705}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1858648119}
@@ -1164,6 +1164,70 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1156596125
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1156596126}
+  m_Layer: 0
+  m_Name: Bottom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1156596126
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156596125}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.4117, y: 0.509, z: 0.775}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1228931616}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1228931615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1228931616}
+  m_Layer: 0
+  m_Name: Positions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1228931616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1228931615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1528171231}
+  - {fileID: 1156596126}
+  m_Father: {fileID: 1703195711}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1349514670
 GameObject:
@@ -1353,6 +1417,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1528171230
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1528171231}
+  m_Layer: 0
+  m_Name: Top
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1528171231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528171230}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.419, y: 0.936, z: 0.291}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1228931616}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1657909266
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1361,6 +1456,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3088243108032630110, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4191245136566976137, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1424,7 +1523,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 3215651180253739591, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4806299823125316812, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1228931616}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8686518377410224632, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
       insertIndex: -1
@@ -1438,6 +1540,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8686518377410224632, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1657909270}
+    - targetCorrespondingSourceObject: {fileID: 8686518377410224632, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1703195712}
   m_SourcePrefab: {fileID: 100100000, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
 --- !u!1 &1657909267 stripped
 GameObject:
@@ -1522,7 +1627,19 @@ MonoBehaviour:
     Color: {r: 1, g: 1, b: 1, a: 1}
     OnInteract:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 1703195712}
+          m_TargetAssemblyTypeName: DwarfSimulator.Car.CarPlace, DwarfSimulator.Car
+          m_MethodName: PlaceTop
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: DwarfSimulator.Player.Player, DwarfSimulator.Player
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     Default: 0
   - Name: Up
     Icon: {fileID: 0}
@@ -1572,6 +1689,25 @@ MonoBehaviour:
   _ownerAuth: 1
   _interpolationTiming: 0
   _adaptiveSynchronization: 2
+--- !u!4 &1703195711 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4806299823125316812, guid: 1b1197426fc4bfd4b9fe4ec3eda40847, type: 3}
+  m_PrefabInstance: {fileID: 1657909266}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1703195712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657909267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1732bc9d6525411387edbc8de9ff7d66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.CarPlace
+  top: {fileID: 1528171231}
+  bottom: {fileID: 1156596126}
 --- !u!1 &1858648118
 GameObject:
   m_ObjectHideFlags: 0

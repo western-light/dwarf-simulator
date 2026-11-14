@@ -148,7 +148,6 @@ GameObject:
   - component: {fileID: 7874944677769804959}
   - component: {fileID: 364472109153463800}
   - component: {fileID: 7110554643496234376}
-  - component: {fileID: 6268318922388543205}
   - component: {fileID: 3912786275773972061}
   m_Layer: 5
   m_Name: InteractButton
@@ -263,7 +262,7 @@ MonoBehaviour:
   _useMaxRoundness: 0
   _uniformRoundness: 0
   _roundnessInPixels: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &6268318922388543205
+--- !u!114 &3912786275773972061
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -272,9 +271,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6420314528350420660}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 98d059abb3674c8da432f8642774e1cb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Interactor.ChoiceButton
   m_Navigation:
     m_Mode: 3
     m_WrapAround: 0
@@ -304,25 +303,9 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 7110554643496234376}
-  m_OnClick:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &3912786275773972061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6420314528350420660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d059abb3674c8da432f8642774e1cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Interactor.ChoiceButton
   choiceText: {fileID: 2754691865662092281}
   choiceIcon: {fileID: 1381361081309876939}
   choiceBackground: {fileID: 7110554643496234376}
-  choiceButton: {fileID: 6268318922388543205}
 --- !u!1 &8155033636120236476
 GameObject:
   m_ObjectHideFlags: 0
