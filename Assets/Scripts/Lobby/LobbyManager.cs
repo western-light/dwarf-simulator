@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
@@ -183,8 +184,9 @@ namespace DwarfSimulator.Lobby
             var lobbySettings = new LobbySettings
             {
                 maxPlayers = _maxPlayer,
-                visibility = LobbyVisibility.Private,  //LobbyVisibility.Public
-                name = _lobbyName
+                visibility = LobbyVisibility.Private,
+                name = _lobbyName,
+                metadata = new Dictionary<string, string> { [LobbyView.LOBBY_PUBLIC] = "0" }
             };
 
             var response = await _orchestrator.lobbyProvider.CreateLobby(lobbySettings);

@@ -8,6 +8,11 @@ using UnityEngine;
 using PurrNet.Lobby;
 using PurrNet;
 using PurrNet.Transports;
+#if !EOS_DISABLE
+using Epic.OnlineServices;
+using Epic.OnlineServices.Lobby;
+using PlayEveryWare.EpicOnlineServices;
+#endif
 
 namespace DwarfSimulator.Lobby
 {
@@ -16,6 +21,7 @@ namespace DwarfSimulator.Lobby
         public const string LOBBY_STATUS_STRING = "LOBBY_STATUS_STRING";
         public const string LOBBY_STATUS_DETAILS_STRING = "LOBBY_STATUS_DETAILS_STRING";
         public const string LOBBY_CONN_INFO = GameStartKeys.ConnInfo;
+        public const string LOBBY_PUBLIC = "LOBBY_PUBLIC";
 
         [SerializeField] private int _minPlayerCount = 2;
         [Space]
@@ -54,6 +60,9 @@ namespace DwarfSimulator.Lobby
         private bool _wasReady = true;
         private bool _lobbyEventsUnsubscribed;
         private string _connectedHostId;
+        private bool _isPublic;
+        private bool _syncingPublicToggle;
+        private ILobby _visibilityChangeLobby;
 
         private GameOrchestrator _orchestrator;
 
@@ -91,6 +100,8 @@ namespace DwarfSimulator.Lobby
 
             _lobby = lobby;
             _orchestrator.activeLobby = lobby;
+            _isPublic = lobby.lobbyData.GetData(LOBBY_PUBLIC) == "1";
+            RefreshPublicToggle();
             Debug.Log($"[Lobby] Lobby={lobby.id}, local EOS={lobby.localPlayer?.id}, host EOS={lobby.owner?.id}, members={lobby.players.Count}", this);
 
             // Destruction is terminal and replays on subscription. Observe it before
@@ -125,6 +136,7 @@ namespace DwarfSimulator.Lobby
 
         void OnEnable()
         {
+            RefreshPublicToggle();
             _publicToggle.onToggled += OnToggleVisibility;
         }
 
@@ -239,10 +251,103 @@ namespace DwarfSimulator.Lobby
 
         private void OnToggleVisibility(bool isOn)
         {
-            if (_lobby == null || !_lobby.isOwner)
+            if (_syncingPublicToggle)
                 return;
 
-            _lobby.SetIsLobbyJoinable(isOn);
+            if (_lobby == null || _closingLobby || _gameStarted || !_lobby.isOwner ||
+                ReferenceEquals(_visibilityChangeLobby, _lobby))
+            {
+                RefreshPublicToggle();
+                return;
+            }
+
+            ChangeVisibilityAsync(_lobby, isOn).Forget("[Lobby] Visibility change failed");
+        }
+
+        private void RefreshPublicToggle()
+        {
+            if (!_publicToggle)
+                return;
+
+            _syncingPublicToggle = true;
+            try
+            {
+                _publicToggle.value = _isPublic;
+            }
+            finally
+            {
+                _syncingPublicToggle = false;
+            }
+        }
+
+        private async Task ChangeVisibilityAsync(ILobby targetLobby, bool isPublic)
+        {
+            _visibilityChangeLobby = targetLobby;
+            // Display the confirmed value until EOS accepts the change.
+            RefreshPublicToggle();
+            try
+            {
+                await SetEOSVisibilityAsync(targetLobby, isPublic);
+                if (!this || _closingLobby || !ReferenceEquals(_lobby, targetLobby))
+                    return;
+
+                _isPublic = isPublic;
+                targetLobby.lobbyData.SetData(LOBBY_PUBLIC, isPublic ? "1" : "0");
+                Debug.Log($"[Lobby] Visibility={(isPublic ? "public (1)" : "private (0)")}", this);
+            }
+            finally
+            {
+                if (ReferenceEquals(_visibilityChangeLobby, targetLobby))
+                    _visibilityChangeLobby = null;
+                if (this && ReferenceEquals(_lobby, targetLobby))
+                    RefreshPublicToggle();
+            }
+        }
+
+        private static async Task SetEOSVisibilityAsync(ILobby lobby, bool isPublic)
+        {
+#if !EOS_DISABLE
+            var api = EOSManager.Instance.GetEOSLobbyInterface();
+            var options = new UpdateLobbyModificationOptions
+            {
+                LobbyId = lobby.id,
+                LocalUserId = EOSManager.Instance.GetProductUserId()
+            };
+            if (api == null)
+                throw new InvalidOperationException("EOS lobbies are not initialized.");
+
+            var result = api.UpdateLobbyModification(ref options, out var modification);
+            if (result != Result.Success)
+                throw new InvalidOperationException($"Cannot edit lobby visibility: {result}");
+
+            try
+            {
+                var permission = new LobbyModificationSetPermissionLevelOptions
+                {
+                    PermissionLevel = isPublic ? LobbyPermissionLevel.Publicadvertised : LobbyPermissionLevel.Inviteonly
+                };
+                result = modification.SetPermissionLevel(ref permission);
+                if (result != Result.Success)
+                    throw new InvalidOperationException($"Cannot set lobby visibility: {result}");
+
+                var completion = new TaskCompletionSource<Result>();
+                var update = new UpdateLobbyOptions { LobbyModificationHandle = modification };
+                api.UpdateLobby(ref update, null, (ref UpdateLobbyCallbackInfo info) =>
+                {
+                    if (Common.IsOperationComplete(info.ResultCode))
+                        completion.TrySetResult(info.ResultCode);
+                });
+                result = await completion.Task;
+                if (result != Result.Success)
+                    throw new InvalidOperationException($"EOS rejected the visibility change: {result}");
+            }
+            finally
+            {
+                modification.Release();
+            }
+#else
+            throw new NotSupportedException("EOS is disabled; lobby visibility cannot be changed.");
+#endif
         }
 
         public void LeaveLobby()
@@ -335,7 +440,17 @@ namespace DwarfSimulator.Lobby
 
         private void OnMetadata(string key, string value)
         {
-            if (_lobby == null || _closingLobby || _lobby.isOwner)
+            if (_lobby == null || _closingLobby)
+                return;
+
+            if (key == LOBBY_PUBLIC)
+            {
+                _isPublic = value == "1";
+                RefreshPublicToggle();
+                return;
+            }
+
+            if (_lobby.isOwner)
                 return;
 
             switch (key)
@@ -468,6 +583,8 @@ namespace DwarfSimulator.Lobby
             DisconnectFromLobby();
             _lobby = null;
             _localPlayerId = null;
+            _isPublic = false;
+            RefreshPublicToggle();
             ClearPlayerEntries();
             if (_lobbyManager)
             {
