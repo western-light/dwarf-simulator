@@ -26,5 +26,6 @@ namespace DwarfSimulator.Player.Interactor
         public Sprite Icon;
         public Color Color;
         public Button.ButtonClickedEvent OnInteract;
+        public bool Default;
     }
 }

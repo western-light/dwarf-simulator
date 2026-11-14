@@ -41,7 +41,7 @@ namespace DwarfSimulator.Player.Interactor
             {
                 GameObject button = Instantiate(interactButtonPrefab, interactUITransform);
                 _choiceObjects[i] = button;
-                
+                button.GetComponent<ChoiceButton>().SetChoice(_choices[i]);
             }
         }
 
