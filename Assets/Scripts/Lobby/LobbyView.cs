@@ -6,6 +6,8 @@ using PurrNet.UI;
 using TMPro;
 using UnityEngine;
 using PurrNet.Lobby;
+using PurrNet;
+using PurrNet.Transports;
 
 namespace DwarfSimulator.Lobby
 {
@@ -37,6 +39,7 @@ namespace DwarfSimulator.Lobby
         [Space]
         [SerializeField] private bool _connectToPurrnetInLobby = true;
         [SerializeField] private LobbyConnectionProvider _lobbyConnection;
+        [SerializeField] private NetworkManager _networkManager;
 
         private ILobby _lobby;
         private bool _lobbyConnected;
@@ -44,15 +47,18 @@ namespace DwarfSimulator.Lobby
         private float _allReadyTimer;
         private bool _wasAllReady;
         private bool _gameStarted;
+        private bool _loadingGame;
         private bool _closingLobby;
         private string _localPlayerId;
         private bool _readyStateInitialized;
         private bool _wasReady = true;
         private bool _lobbyEventsUnsubscribed;
+        private string _connectedHostId;
 
         private GameOrchestrator _orchestrator;
 
         public ILobby lobby => _lobby;
+        private readonly Dictionary<IPlayer, GameObject> _uiPlayerEntry = new();
 
 #if PURR_VOICE
         public bool localMicEnabled => _hasLocalMicEnabled;
@@ -62,6 +68,12 @@ namespace DwarfSimulator.Lobby
 
         public void Setup(ILobby lobby, GameOrchestrator orchestrator)
         {
+            if (lobby == null || !orchestrator)
+                throw new ArgumentException("A lobby and an orchestrator are required.");
+
+            if (_lobby != null && !ReferenceEquals(_lobby, lobby))
+                LeaveLobby();
+
             UnsubscribeLobbyEvents();
             DisconnectFromLobby();
             ClearPlayerEntries();
@@ -71,17 +83,15 @@ namespace DwarfSimulator.Lobby
             _readyStateInitialized = false;
             _lobbyEventsUnsubscribed = false;
             _gameStarted = false;
+            _loadingGame = false;
             _wasAllReady = false;
             _closingLobby = false;
             _localPlayerId = lobby?.localPlayer?.id;
             ResetStatusLabels();
 
-            // _playerPlaceholderPool ??= new UIPool<Transform>(_playerPlaceholderPrefab.transform, _playerContent);
-
             _lobby = lobby;
             _orchestrator.activeLobby = lobby;
-
-            // RenderPlayerList(lobby);
+            Debug.Log($"[Lobby] Lobby={lobby.id}, local EOS={lobby.localPlayer?.id}, host EOS={lobby.owner?.id}, members={lobby.players.Count}", this);
 
             // Destruction is terminal and replays on subscription. Observe it before
             // replaying player joins, which can otherwise start a transient connection
@@ -90,10 +100,19 @@ namespace DwarfSimulator.Lobby
             if (_closingLobby)
                 return;
 
-            _lobby.onPlayerJoined += OnPlayerJoined;
             _lobby.onPlayerLeft += OnPlayerLeft;
             _lobby.onPlayerUpdated += OnPlayerUpdated;
             _lobby.onOwnerChanged += OnOwnerChanged;
+            _lobby.onPlayerJoined += OnPlayerJoined;
+
+            _lobby.lobbyData.onDataChanged += OnMetadata;
+
+            showRock();
+            RenderPlayerList(lobby);
+            _lobbyCode.text = lobby.joinCode;
+            _microphoneFeature.SetActive(false);
+            ConnectToLobby(lobby);
+            _lobbyManager.GoToLobby();
 
             if (_lobby.lobbyData.TryGetData(LOBBY_STATUS_STRING, out var lobbyStatus))
                 OnMetadata(LOBBY_STATUS_STRING, lobbyStatus);
@@ -102,18 +121,6 @@ namespace DwarfSimulator.Lobby
             if (_lobby.lobbyData.TryGetData(LOBBY_CONN_INFO, out var lobbyConnInfo))
                 OnMetadata(LOBBY_CONN_INFO, lobbyConnInfo);
 
-            _lobby.lobbyData.onDataChanged += OnMetadata;
-
-            // _chat.Setup(lobby);
-            _lobbyCode.text = lobby.joinCode;
-
-            _microphoneFeature.SetActive(false);
-            ConnectToLobby(lobby);
-            // UpdateMicGraphics();
-
-
-            showRock();
-            _lobbyManager.GoToLobby();
         }
 
         void OnEnable()
@@ -124,6 +131,21 @@ namespace DwarfSimulator.Lobby
         void OnDisable()
         {
             _publicToggle.onToggled -= OnToggleVisibility;
+        }
+
+        private void OnDestroy()
+        {
+            // The game scene keeps membership in the shared orchestrator.
+            _closingLobby = true;
+            UnsubscribeLobbyEvents();
+            DisconnectFromLobby();
+            if (!_loadingGame)
+            {
+                ClearActiveLobby();
+                _lobby?.LeaveLobby();
+            }
+            _lobby = null;
+            ClearPlayerEntries();
         }
 
 
@@ -191,15 +213,21 @@ namespace DwarfSimulator.Lobby
 
         public void ButtonStartGame()
         {
-            if (_lobby.players.Count > _minPlayerCount)
-            {
-                _gameStarted = true;
+            StartGame();
+        }
 
+        private bool CanStartGame()
+        {
+            return _lobby != null && !_closingLobby && !_gameStarted &&
+                   _lobby.isOwner && _lobby.players.Count >= _minPlayerCount;
+        }
+
+        private void SetLoadingStatus()
+        {
+            if (_lobby.isOwner)
+            {
                 _lobbyStatusDetails.text = $"LOADING ...";
                 _lobby.lobbyData.SetData(LOBBY_STATUS_DETAILS_STRING, _lobbyStatusDetails.text);
-
-                StartGame();
-                return;
             }
         }
 
@@ -222,21 +250,17 @@ namespace DwarfSimulator.Lobby
             if (_closingLobby)
                 return;
 
-            _closingLobby = true;
             var lobby = _lobby;
-            ClearActiveLobby();
-            DisconnectFromLobby();
+            CloseLobbyView();
             lobby?.LeaveLobby();
-            // PopMe();
         }
 
         private void showRock()
         {
-            int i = 0;
-            foreach(var rock in _rocks)
+            for (int i = 0; i < _rocks.Count; i++)
             {
-                i++;
-                rock.SetActive(_lobby.maxPlayers < i ? true : false);
+                if (_rocks[i])
+                    _rocks[i].SetActive(i < _lobby.maxPlayers);
             }
         }
 
@@ -256,34 +280,62 @@ namespace DwarfSimulator.Lobby
 
         private void DisconnectFromLobby()
         {
-            if (!_lobbyConnected)
-                return;
-
             // Clear this first because stopping the transport can synchronously
             // invoke lobby/provider callbacks.
+            bool wasConnected = _lobbyConnected;
             _lobbyConnected = false;
-            if (_lobby != null && _lobbyConnection)
+            _connectedHostId = null;
+
+            var manager = ResolveNetworkManager();
+            // EOS StopListening clears its host-loopback flag. Stop the local
+            // client first, while Disconnect can still recognise that loopback.
+            if (manager && manager.transport)
+                manager.StopClient();
+
+            // LeftLobby also cancels the provider's pending automatic restarts.
+            if (wasConnected && _lobby != null && _lobbyConnection)
                 _lobbyConnection.LeftLobby(_lobby);
 
-            _lobbyManager.GoToMainMenu();
+            if (manager && manager.transport)
+            {
+                if (manager.serverState != ConnectionState.Disconnected &&
+                    manager.serverState != ConnectionState.Disconnecting)
+                    manager.StopServer();
+                manager.onClientConnectionState -= OnLobbyClientConnectionState;
+                manager.onServerConnectionState -= OnLobbyServerConnectionState;
+                manager.onPlayerJoined -= OnNetworkPlayerJoined;
+            }
         }
 
-        private readonly Dictionary<IPlayer, PlayerEntry> _uiPlayerEntry = new();
-
-        private void ClearPlayerEntries()
+        private NetworkManager ResolveNetworkManager()
         {
-            foreach (var entry in _uiPlayerEntry.Values)
+            if (!_networkManager && _lobbyConnection)
             {
-                if (entry)
-                    Destroy(entry.gameObject);
+                _networkManager = _lobbyConnection.GetComponent<NetworkManager>();
+                if (!_networkManager)
+                    _networkManager = _lobbyConnection.GetComponentInParent<NetworkManager>();
             }
-            _uiPlayerEntry.Clear();
+            return _networkManager;
+        }
+
+        private void OnLobbyClientConnectionState(ConnectionState state)
+        {
+            Debug.Log($"[Lobby] Client={state}, local EOS={_lobby?.localPlayer?.id}, host EOS={_connectedHostId}", this);
+        }
+
+        private void OnLobbyServerConnectionState(ConnectionState state)
+        {
+            Debug.Log($"[Lobby] Listening={state}, local EOS={_lobby?.localPlayer?.id}", this);
+        }
+
+        private void OnNetworkPlayerJoined(PlayerID player, bool isReconnect, bool asServer)
+        {
+            Debug.Log($"[Lobby] PurrNet player registered={player}, asServer={asServer}, local EOS={_localPlayerId}", this);
         }
 
         private void OnMetadata(string key, string value)
         {
-            Debug.Log("Metadata //////");
-            if (_lobby.isOwner)
+            if (_lobby == null || _closingLobby || _lobby.isOwner)
                 return;
 
             switch (key)
@@ -306,29 +358,43 @@ namespace DwarfSimulator.Lobby
             }
         }
 
-        private void StartGame()
+        public void StartGame()
         {
+            if (!CanStartGame())
+                return;
+
+            _gameStarted = true;
+            SetLoadingStatus();
+            var startingLobby = _lobby;
             LaunchGame(async loadingView =>
             {
-                var joinInfo = await _orchestrator.gameAllocator.AllocateGame(lobby);
-                if (!this || _lobby == null)
+                var orchestrator = _orchestrator;
+                var joinInfo = await orchestrator.gameAllocator.AllocateGame(startingLobby);
+                if (!this || _closingLobby || !ReferenceEquals(_lobby, startingLobby))
                     return;
 
                 if (!joinInfo.success)
                     throw new Exception(joinInfo.error);
 
-                GameStartKeys.PublishConnectionInfo(_lobby, joinInfo.connection);
+                GameStartKeys.PublishConnectionInfo(startingLobby, joinInfo.connection);
 
                 // TODO :
                 // loadingView.Setup("Loading game ...");
-                var orchestrator = _orchestrator;
-                await orchestrator.gameAllocator.LoadGame(lobby);
-                orchestrator.gameAllocator.Connect(joinInfo.connection, true);
+                _loadingGame = true;
+                DisconnectFromLobby();
+                await orchestrator.gameAllocator.LoadGame(startingLobby);
+                if (ReferenceEquals(orchestrator.activeLobby, startingLobby))
+                    orchestrator.gameAllocator.Connect(joinInfo.connection, true);
             }).Forget("[LobbyView] StartGame failed");
         }
 
         private void JoinGame(string rawConnectionInfo)
         {
+            if (_gameStarted || _closingLobby || _lobby == null || string.IsNullOrEmpty(rawConnectionInfo))
+                return;
+
+            _gameStarted = true;
+            var joiningLobby = _lobby;
             LaunchGame(async loadingView =>
             {
                 if (!GameStartKeys.TryReadConnectionInfo(rawConnectionInfo, out var info))
@@ -337,8 +403,11 @@ namespace DwarfSimulator.Lobby
                 // TODO :
                 // loadingView.Setup("Loading game ...");
                 var orchestrator = _orchestrator;
-                await orchestrator.gameAllocator.LoadGame(lobby);
-                orchestrator.gameAllocator.Connect(info, false);
+                _loadingGame = true;
+                DisconnectFromLobby();
+                await orchestrator.gameAllocator.LoadGame(joiningLobby);
+                if (ReferenceEquals(orchestrator.activeLobby, joiningLobby))
+                    orchestrator.gameAllocator.Connect(info, false);
             }).Forget("[LobbyView] JoinGame failed");
         }
 
@@ -359,7 +428,8 @@ namespace DwarfSimulator.Lobby
                 Toaster.PushError("Failed to start game", e);
                 Debug.LogError("Failed to start game");
                 Debug.LogException(e, _orchestrator.gameAllocator);
-                ResetStartState();
+                if (this && !_closingLobby)
+                    ResetStartState();
             }
             finally
             {
@@ -373,7 +443,12 @@ namespace DwarfSimulator.Lobby
             ResetStatusLabels();
             _wasAllReady = false;
             _gameStarted = false;
+            _loadingGame = false;
             _allReadyTimer = _timeToStartGame;
+            if (_lobby?.isOwner == true)
+                _lobby.lobbyData.RemoveData(LOBBY_CONN_INFO);
+            ConnectToLobby(_lobby);
+            OnOwnerChanged(_lobby?.owner);
             // _lobby?.localPlayer?.SetReady(false);
         }
 
@@ -388,8 +463,17 @@ namespace DwarfSimulator.Lobby
                 return;
 
             _closingLobby = true;
+            UnsubscribeLobbyEvents();
             ClearActiveLobby();
             DisconnectFromLobby();
+            _lobby = null;
+            _localPlayerId = null;
+            ClearPlayerEntries();
+            if (_lobbyManager)
+            {
+                _lobbyManager.showMainMenu();
+                _lobbyManager.GoToMainMenu();
+            }
         }
 
         private void ClearActiveLobby()
@@ -400,20 +484,25 @@ namespace DwarfSimulator.Lobby
 
         private void OnPlayerJoined(IPlayer player)
         {
+            if (_closingLobby || _lobby == null)
+                return;
             var localPlayer = _lobby?.localPlayer;
             if (localPlayer != null)
                 _localPlayerId = localPlayer.id;
 
-            // TODO :
-            // RenderPlayerList(_lobby);
             ConnectToLobby(_lobby);
 
             if (_lobbyConnected)
                 _lobbyConnection.OnPlayerRegistered(player);
+
+            Debug.Log($"[Lobby] EOS member={player.id}, local EOS={_localPlayerId}, members={_lobby.players.Count}", this);
+            RenderPlayerList(_lobby);
         }
 
         private void OnPlayerLeft(IPlayer player)
         {
+            if (_closingLobby || _lobby == null)
+                return;
             if (player != null && !string.IsNullOrEmpty(_localPlayerId) && player.id == _localPlayerId)
             {
                 CloseLobbyView();
@@ -421,10 +510,12 @@ namespace DwarfSimulator.Lobby
             }
 
             if (_uiPlayerEntry.Remove(player, out var entry) && entry)
+            {
+                entry.SetActive(false);
                 Destroy(entry.gameObject);
+            }
 
-            // TODO :
-            // RenderPlayerList(_lobby);
+            RenderPlayerList(_lobby);
 
             if (_lobbyConnected)
                 _lobbyConnection.OnPlayerUnregistered(player);
@@ -432,7 +523,7 @@ namespace DwarfSimulator.Lobby
 
         private void ConnectToLobby(ILobby lobby)
         {
-            if (!_closingLobby && _connectToPurrnetInLobby && _lobby.localPlayer != null &&
+            if (!_closingLobby && !_loadingGame && _connectToPurrnetInLobby && lobby?.localPlayer != null &&
                 !_lobbyConnected && _lobbyConnection)
             {
                 // Mark connected first because provider setup can synchronously replay
@@ -440,7 +531,20 @@ namespace DwarfSimulator.Lobby
                 _lobbyConnected = true;
                 try
                 {
+                    var manager = ResolveNetworkManager();
+                    if (manager)
+                    {
+                        manager.onClientConnectionState -= OnLobbyClientConnectionState;
+                        manager.onServerConnectionState -= OnLobbyServerConnectionState;
+                        manager.onPlayerJoined -= OnNetworkPlayerJoined;
+                        manager.onClientConnectionState += OnLobbyClientConnectionState;
+                        manager.onServerConnectionState += OnLobbyServerConnectionState;
+                        manager.onPlayerJoined += OnNetworkPlayerJoined;
+                    }
                     _lobbyConnection.JoinedLobby(lobby);
+                    // Membership can become available after the owner event was
+                    // replayed. Bootstrap explicitly once both are known.
+                    OnOwnerChanged(lobby.owner);
                 }
                 catch
                 {
@@ -476,8 +580,18 @@ namespace DwarfSimulator.Lobby
 
         private void OnOwnerChanged(IPlayer host)
         {
-            if (_lobbyConnected && _lobbyConnection)
-                _lobbyConnection.OnHostChanged(_lobby, host, host == _lobby.localPlayer);
+            if (_closingLobby || _loadingGame || host == null || !_lobbyConnected || !_lobbyConnection ||
+                _connectedHostId == host.id)
+                return;
+
+            _connectedHostId = host.id;
+            var manager = ResolveNetworkManager();
+            if (manager && manager.transport)
+                manager.StopClient();
+
+            // The provider stops the server next. Do not replay this for the same
+            // owner: doing so tears down a host which has just started listening.
+            _lobbyConnection.OnHostChanged(_lobby, host, host.id == _lobby.localPlayer?.id);
         }
 
 #if PURR_VOICE
@@ -516,5 +630,48 @@ namespace DwarfSimulator.Lobby
             _lobbyStatus.SetText("WAITING FOR PLAYERS");
             _lobbyStatusDetails.SetText("READY UP!");
         }
+
+        private void RenderPlayerList(ILobby lobby)
+        {
+            int i = 0;
+            foreach (var player in lobby.players)
+            {
+                if (i >= _rocks.Count)
+                    break;
+                if (!_uiPlayerEntry.ContainsKey(player))
+                    CreatePlayerEntry(player, i);
+                else if (_uiPlayerEntry[player])
+                    _uiPlayerEntry[player].transform.SetParent(_rocks[i].transform, false);
+                i++;
+            }
+
+            UpdateLocalPlayerData(lobby);
+        }
+
+        private void CreatePlayerEntry(IPlayer player, int index)
+        {
+            var entry = Instantiate(_prefabPerso, _rocks[index].transform);
+            entry.transform.localPosition = Vector3.zero;
+            // entry.Setup(_lobby, player, OnKickPlayer);
+            _uiPlayerEntry.Add(player, entry);
+        }
+
+        private void ClearPlayerEntries()
+        {
+            foreach (var entry in _uiPlayerEntry.Values)
+            {
+                if (entry)
+                {
+                    entry.SetActive(false);
+                    Destroy(entry.gameObject);
+                }
+            }
+            _uiPlayerEntry.Clear();
+        }
+
+        // private void OnKickPlayer(IPlayer target)
+        // {
+        //     _lobby.KickPlayer(target);
+        // }
     }
 }

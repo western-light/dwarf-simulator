@@ -1252,7 +1252,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 393882605}
         m_TargetAssemblyTypeName: DwarfSimulator.Lobby.LobbyView, DwarfSimulator.Lobby
-        m_MethodName: StartGame
+        m_MethodName: ButtonStartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2306,15 +2306,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: DwarfSimulator.Lobby::DwarfSimulator.Lobby.LobbyView
   _minPlayerCount: 2
   _rocks:
-  - {fileID: 2046017159}
-  - {fileID: 458905084}
-  - {fileID: 751515099}
-  - {fileID: 491481877}
-  - {fileID: 2122219860}
   - {fileID: 295961277}
+  - {fileID: 2122219860}
   - {fileID: 1938959139}
   - {fileID: 2028314907}
-  _prefabPerso: {fileID: 1009215913774552843, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+  - {fileID: 458905084}
+  - {fileID: 2046017159}
+  - {fileID: 751515099}
+  - {fileID: 491481877}
+  _prefabPerso: {fileID: 6176887594042252844, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
   _lobbyCode: {fileID: 1893272810}
   _publicToggle: {fileID: 1345761336}
   _lobbyManager: {fileID: 393882606}
@@ -2700,8 +2700,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkManager
   _stopPlayingOnDisconnect: 0
-  _startServerFlags: 1
-  _startClientFlags: 1
+  _startServerFlags: 0
+  _startClientFlags: 0
   _cookieScope: 1
   _dontDestroyOnLoad: 0
   _transport: {fileID: 519434376}
@@ -10104,45 +10104,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 39.187
       objectReference: {fileID: 0}
-    - target: {fileID: 2506188705522217567, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.017
-      objectReference: {fileID: 0}
-    - target: {fileID: 5927632757293969866, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.07
-      objectReference: {fileID: 0}
     - target: {fileID: 7006968310507774509, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_Name
       value: fire
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.999387
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0.024167567
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.025322482
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.000612393
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -2.771
-      objectReference: {fileID: 0}
-    - target: {fileID: 8803104141469836573, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 2.903
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

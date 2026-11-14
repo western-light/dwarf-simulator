@@ -5,7 +5,6 @@ using TMPro;
 using PurrNet.Lobby;
 using PurrNet.UI;
 using Unity.Cinemachine;
-using UnityEditor.PackageManager;
 
 namespace DwarfSimulator.Lobby
 {
@@ -35,6 +34,8 @@ namespace DwarfSimulator.Lobby
 
         private LobbyProvider _subscribedProvider;
         private MatchmakingProvider _matchMakingProvider;
+        private Task _initializationTask;
+        private bool _lobbyOperationInProgress;
 
 
         void Awake()
@@ -51,6 +52,8 @@ namespace DwarfSimulator.Lobby
         private void OnDestroy()
         {
             UnsubscribeExternalJoin();
+            if (_codeField)
+                _codeField.onSubmit.RemoveListener(OnCodeSubmit);
 
             if (_matchMakingProvider)
             {
@@ -62,28 +65,37 @@ namespace DwarfSimulator.Lobby
 
         public void Initialize()
         {
-            InitializeAsync().Forget("[LobbyManager] Initialize failed");
-
-            _codeField.onSubmit.RemoveAllListeners();
+            _codeField.onSubmit.RemoveListener(OnCodeSubmit);
             _codeField.text = "";
             _codeField.ActivateInputField();
             _codeField.onSubmit.AddListener(OnCodeSubmit);
 
             lobbyView = gameObject.GetComponent<LobbyView>();
 
-            _matchMakingProvider = _orchestrator.matchmakingProvider;
             if (_matchMakingProvider)
+            {
+                _matchMakingProvider.onStatusChanged -= OnStatusChanged;
+                _matchMakingProvider.onMatchFound -= OnMatchFound;
+                _matchMakingProvider.onMatchmakingError -= OnMatchmakingError;
+            }
+            _matchMakingProvider = _orchestrator.matchmakingProvider;
+            if (_matchMakingProvider) 
             {
                 _matchMakingProvider.onStatusChanged += OnStatusChanged;
                 _matchMakingProvider.onMatchFound += OnMatchFound;
                 _matchMakingProvider.onMatchmakingError += OnMatchmakingError;
             }
+
+            InitializeAsync().Forget("[LobbyManager] Initialize failed");
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
-            // GameOrchestrator.active = _orchestrator;
+            return _initializationTask ??= InitializeProvidersAsync();
+        }
 
+        private async Task InitializeProvidersAsync()
+        {
             if (_orchestrator.sessionProvider)
                 await _orchestrator.sessionProvider.Login(_stack);
 
@@ -96,7 +108,8 @@ namespace DwarfSimulator.Lobby
             if (_orchestrator.gameAllocator)
                 await _orchestrator.gameAllocator.Initialize();
 
-            SubscribeExternalJoin();
+            if (this)
+                SubscribeExternalJoin();
 
             // _stack.Push<MainMenuView>().Setup(this, _orchestrator);
         }
@@ -142,11 +155,31 @@ namespace DwarfSimulator.Lobby
         {
 
             // UiTask.Run(CreateLobbyAsync, "Lobby Creation Failed", _loadingOverlay, closeGuard: _closeParentView);
-            UiTask.Run(CreateLobbyAsync, "Lobby Creation Failed");
+            UiTask.Run(() => RunLobbyOperation(CreateLobbyAsync), "Lobby Creation Failed");
+        }
+
+        private async Task RunLobbyOperation(Func<Task> operation)
+        {
+            if (_lobbyOperationInProgress)
+                return;
+
+            _lobbyOperationInProgress = true;
+            try
+            {
+                await InitializeAsync();
+                if (this)
+                    await operation();
+            }
+            finally
+            {
+                _lobbyOperationInProgress = false;
+            }
         }
 
         private async Task CreateLobbyAsync()
         {
+            if (lobbyView.lobby != null)
+                return;
             var lobbySettings = new LobbySettings
             {
                 maxPlayers = _maxPlayer,
@@ -157,12 +190,15 @@ namespace DwarfSimulator.Lobby
             var response = await _orchestrator.lobbyProvider.CreateLobby(lobbySettings);
             
             if (!this)
+            {
+                response.lobby?.LeaveLobby();
                 return;
+            }
 
             if (!response.success)
             {
                 // Toaster.Push("Lobby Creation Failed", response.error, true);
-                Debug.LogError("Lobby Creation Failed");
+                Debug.LogError($"Lobby Creation Failed: {response.error}");
                 return;
             }
 
@@ -188,7 +224,7 @@ namespace DwarfSimulator.Lobby
 
         private void OnExternalJoinRequested(string lobbyId)
         {
-            JoinExternalAsync(lobbyId).Forget("[LobbyManager] External join failed");
+            RunLobbyOperation(() => JoinExternalAsync(lobbyId)).Forget("[LobbyManager] External join failed");
         }
 
         /// <summary>
@@ -208,10 +244,7 @@ namespace DwarfSimulator.Lobby
             if (_orchestrator.activeLobby?.id == lobbyId)
                 return;
 
-            // Leave the current lobby through the standard path (pops its view too).
-            // var currentLobbyView = _stack.GetFirstView<LobbyView>();
-            // if (currentLobbyView)
-            //     currentLobbyView.LeaveLobby();
+            lobbyView.LeaveLobby();
 
             var loadingView = _stack.Push<LoadingView>();
             loadingView.Setup("Joining lobby ...");
@@ -221,7 +254,10 @@ namespace DwarfSimulator.Lobby
                 var response = await provider.JoinLobby(lobbyId);
 
                 if (!this)
+                {
+                    response.lobby?.LeaveLobby();
                     return;
+                }
 
                 if (!response.success)
                 {
@@ -229,7 +265,7 @@ namespace DwarfSimulator.Lobby
                     return;
                 }
 
-                // _stack.Push<LobbyView>().Setup(response.lobby, _orchestrator);
+                lobbyView.Setup(response.lobby, _orchestrator);
             }
             catch (Exception e)
             {
@@ -252,21 +288,33 @@ namespace DwarfSimulator.Lobby
 
         public void CodeSubmit()
         {
-            UiTask.Run(CodeSubmitAsync, "Join Failed");
+            UiTask.Run(() => RunLobbyOperation(CodeSubmitAsync), "Join Failed");
         }
 
         private async Task CodeSubmitAsync()
         {
+            if (lobbyView.lobby != null || string.IsNullOrWhiteSpace(_codeField.text))
+                return;
+
             var response = await _orchestrator.lobbyProvider.JoinLobbyByCode(_codeField.text.Trim());
 
             if (!this)
+            {
+                response.lobby?.LeaveLobby();
                 return;
+            }
 
             if (!response.success)
             {
                 // Toaster.Push("Join Failed", response.error, true);
-                Debug.LogError("Join Failed");
+                Debug.LogError($"Join Failed: {response.error}");
                 return;
+            }
+
+            if (response.lobby.isOwner)
+            {
+                Debug.LogWarning($"[Lobby] Join by code returned the owner identity: EOS={response.lobby.localPlayer?.id}. " +
+                    "If another instance created this lobby, compare its local EOS id: both instances may be using the same EOS account.", this);
             }
 
             lobbyView.Setup(response.lobby, _orchestrator);
