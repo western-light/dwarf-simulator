@@ -16,6 +16,7 @@ using PlayEveryWare.EpicOnlineServices;
 
 namespace DwarfSimulator.Lobby
 {
+    [DefaultExecutionOrder(1000)]
     public class LobbyView : MonoBehaviour
     {
         public const string LOBBY_STATUS_STRING = "LOBBY_STATUS_STRING";
@@ -63,6 +64,8 @@ namespace DwarfSimulator.Lobby
         private bool _isPublic;
         private bool _syncingPublicToggle;
         private ILobby _visibilityChangeLobby;
+        private RectTransform _publicToggleKnob;
+        private RectangleGraphic _publicToggleBackground;
 
         private GameOrchestrator _orchestrator;
 
@@ -100,7 +103,7 @@ namespace DwarfSimulator.Lobby
 
             _lobby = lobby;
             _orchestrator.activeLobby = lobby;
-            _isPublic = lobby.lobbyData.GetData(LOBBY_PUBLIC) == "1";
+            _isPublic = ReadPublicVisibility(lobby);
             RefreshPublicToggle();
             Debug.Log($"[Lobby] Lobby={lobby.id}, local EOS={lobby.localPlayer?.id}, host EOS={lobby.owner?.id}, members={lobby.players.Count}", this);
 
@@ -137,12 +140,42 @@ namespace DwarfSimulator.Lobby
         void OnEnable()
         {
             RefreshPublicToggle();
-            _publicToggle.onToggled += OnToggleVisibility;
+            if (_publicToggle)
+                _publicToggle.onToggled += OnToggleVisibility;
         }
 
         void OnDisable()
         {
-            _publicToggle.onToggled -= OnToggleVisibility;
+            if (_publicToggle)
+                _publicToggle.onToggled -= OnToggleVisibility;
+        }
+
+        private void LateUpdate()
+        {
+            if (!_publicToggle || !_publicToggle.gameObject.activeInHierarchy)
+                return;
+
+            // The menu prefab saves the knob on the right and has several theme
+            // bindings. Apply the confirmed state after their visual updates.
+            if (!_publicToggleKnob)
+                _publicToggleKnob = _publicToggle.transform.Find("Nob") as RectTransform;
+            if (!_publicToggleBackground)
+                _publicToggleBackground = _publicToggle.GetComponent<RectangleGraphic>();
+
+            if (_publicToggleKnob && _publicToggle.transform is RectTransform track)
+            {
+                float offset = Mathf.Max(0f, (track.rect.width - _publicToggleKnob.rect.width) * 0.5f - 2f);
+                var position = _publicToggleKnob.anchoredPosition;
+                position.x = _isPublic ? offset : -offset;
+                _publicToggleKnob.anchoredPosition = position;
+            }
+            if (_publicToggleBackground)
+            {
+                _publicToggleBackground.color = Color.white;
+                _publicToggleBackground.graphicColor = _isPublic
+                    ? new Color(0.016f, 0.518f, 0.965f)
+                    : new Color(0.153f, 0.153f, 0.157f);
+            }
         }
 
         private void OnDestroy()
@@ -278,6 +311,35 @@ namespace DwarfSimulator.Lobby
             {
                 _syncingPublicToggle = false;
             }
+        }
+
+        private static bool ReadPublicVisibility(ILobby lobby)
+        {
+#if !EOS_DISABLE
+            var api = EOSManager.Instance.GetEOSLobbyInterface();
+            if (api != null)
+            {
+                var options = new CopyLobbyDetailsHandleOptions
+                {
+                    LobbyId = lobby.id,
+                    LocalUserId = EOSManager.Instance.GetProductUserId()
+                };
+                if (api.CopyLobbyDetailsHandle(ref options, out var details) == Result.Success)
+                {
+                    try
+                    {
+                        var infoOptions = new LobbyDetailsCopyInfoOptions();
+                        if (details.CopyInfo(ref infoOptions, out var info) == Result.Success && info.HasValue)
+                            return info.Value.PermissionLevel == LobbyPermissionLevel.Publicadvertised;
+                    }
+                    finally
+                    {
+                        details.Release();
+                    }
+                }
+            }
+#endif
+            return lobby.lobbyData.GetData(LOBBY_PUBLIC) == "1";
         }
 
         private async Task ChangeVisibilityAsync(ILobby targetLobby, bool isPublic)
@@ -629,7 +691,7 @@ namespace DwarfSimulator.Lobby
             if (_uiPlayerEntry.Remove(player, out var entry) && entry)
             {
                 entry.SetActive(false);
-                Destroy(entry.gameObject);
+                UnityProxy.DestroyDirectly(entry);
             }
 
             RenderPlayerList(_lobby);
@@ -755,10 +817,10 @@ namespace DwarfSimulator.Lobby
             {
                 if (i >= _rocks.Count)
                     break;
-                if (!_uiPlayerEntry.ContainsKey(player))
+                if (!_uiPlayerEntry.TryGetValue(player, out var entry) || !entry)
                     CreatePlayerEntry(player, i);
-                else if (_uiPlayerEntry[player])
-                    _uiPlayerEntry[player].transform.SetParent(_rocks[i].transform, false);
+                else
+                    entry.transform.SetParent(_rocks[i].transform, false);
                 i++;
             }
 
@@ -767,10 +829,17 @@ namespace DwarfSimulator.Lobby
 
         private void CreatePlayerEntry(IPlayer player, int index)
         {
-            var entry = Instantiate(_prefabPerso, _rocks[index].transform);
+            // These are local roster decorations. Normal Instantiate is rewritten
+            // by PurrNet and can spawn/reject/despawn this registered player prefab.
+            var entry = UnityProxy.InstantiateDirectly(_prefabPerso, _rocks[index].transform, false);
+            foreach (var identity in entry.GetComponentsInChildren<NetworkIdentity>(true))
+            {
+                identity.skipSceneAutoSpawning = true;
+                identity.enabled = false;
+            }
             entry.transform.localPosition = Vector3.zero;
             // entry.Setup(_lobby, player, OnKickPlayer);
-            _uiPlayerEntry.Add(player, entry);
+            _uiPlayerEntry[player] = entry;
         }
 
         private void ClearPlayerEntries()
@@ -780,7 +849,7 @@ namespace DwarfSimulator.Lobby
                 if (entry)
                 {
                     entry.SetActive(false);
-                    Destroy(entry.gameObject);
+                    UnityProxy.DestroyDirectly(entry);
                 }
             }
             _uiPlayerEntry.Clear();

@@ -179,7 +179,7 @@ namespace DwarfSimulator.Lobby
 
         private async Task CreateLobbyAsync()
         {
-            if (lobbyView.lobby != null)
+            if (lobbyView.lobby != null || _currentTicket.HasValue)
                 return;
             var lobbySettings = new LobbySettings
             {
@@ -295,10 +295,14 @@ namespace DwarfSimulator.Lobby
 
         private async Task CodeSubmitAsync()
         {
-            if (lobbyView.lobby != null || string.IsNullOrWhiteSpace(_codeField.text))
+            if (lobbyView.lobby != null || _currentTicket.HasValue || string.IsNullOrWhiteSpace(_codeField.text))
                 return;
 
-            var response = await _orchestrator.lobbyProvider.JoinLobbyByCode(_codeField.text.Trim());
+            var code = _codeField.text.Trim();
+            // New EOS codes use uppercase letters; keep older full ids usable.
+            if (code.Length <= 8)
+                code = code.ToUpperInvariant();
+            var response = await _orchestrator.lobbyProvider.JoinLobbyByCode(code);
 
             if (!this)
             {
@@ -328,26 +332,39 @@ namespace DwarfSimulator.Lobby
 
         public void MatchMaking()
         {
-            Debug.Log("Matchmaking to implemente");
-            StartMatchmakingAsync(new MatchmakingRequest
+            UiTask.Run(() => RunLobbyOperation(() => StartMatchmakingAsync(new MatchmakingRequest
             {
-                gameMode = "PurrNet"
-            }).Forget("[MatchmakingView] StartMatchmaking failed");
+                // A non-empty gameMode makes the generic matchmaker require its
+                // own matchmaking markers, excluding manually created public rooms.
+                gameMode = string.Empty,
+                attributes = new Dictionary<string, string> { [LobbyView.LOBBY_PUBLIC] = "1" }
+            })), "Matchmaking Failed");
         }
 
         private async Task StartMatchmakingAsync(MatchmakingRequest request)
         {
+            if (lobbyView.lobby != null || _currentTicket.HasValue)
+                return;
+            if (!_matchMakingProvider)
+                throw new InvalidOperationException("No matchmaking provider is configured.");
+
+            _failed = false;
+            _cancelling = false;
             var response = await _matchMakingProvider.StartMatchmaking(request);
 
             if (!this)
+            {
+                if (response.success)
+                    await _matchMakingProvider.CancelMatchmaking(response.ticket);
                 return;
+            }
 
             if (!response.success)
             {
                 Debug.LogError("Matchmaking failed " + response.error);
                 // PopMe();
             }
-            else
+            else if (!_failed && lobbyView.lobby == null && !_cancelling)
             {
                 _currentTicket = response.ticket;
             }
@@ -355,6 +372,8 @@ namespace DwarfSimulator.Lobby
 
         private void OnMatchFound(MatchmakingTicket ticket, MatchResult result)
         {
+            _currentTicket = null;
+            _cancelling = false;
             if (result.lobby != null)
             {
                 lobbyView.Setup(result.lobby, _orchestrator);
@@ -427,6 +446,13 @@ namespace DwarfSimulator.Lobby
 
         private void OnStatusChanged(MatchmakingTicket ticket, MatchmakingStatus status)
         {
+            if (status == MatchmakingStatus.Searching)
+                _currentTicket = ticket;
+            else if (status == MatchmakingStatus.Found || status == MatchmakingStatus.Cancelled ||
+                     status == MatchmakingStatus.Failed)
+                _currentTicket = null;
+
+            Debug.Log($"[Lobby] Matchmaking: {status}", this);
             // TODO : 
             // _message.text = $"Matchmaking: {status}";
 
@@ -443,6 +469,7 @@ namespace DwarfSimulator.Lobby
                 return;
 
             _failed = true;
+            _currentTicket = null;
             Debug.LogError("Matchmaking failed : " + error);
         }
 

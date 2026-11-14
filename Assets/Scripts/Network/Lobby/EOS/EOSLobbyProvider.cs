@@ -53,7 +53,27 @@ namespace DwarfSimulator.Lobby.EOS
                 EnableJoinById = true,
             };
 
-            var (result, lobbyId) = await EOSLobbyApi.CreateLobby(options);
+            // Use the lobby id itself as the shareable code, including for private
+            // lobbies: no public lookup table is needed to resolve the code.
+            const string codeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            var codeBytes = new byte[8];
+            var codeCharacters = new char[8];
+            var result = Result.LobbyLobbyAlreadyExists;
+            string lobbyId = null;
+            using (var random = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                for (int attempt = 0; attempt < 5; attempt++)
+                {
+                    random.GetBytes(codeBytes);
+                    for (int i = 0; i < codeCharacters.Length; i++)
+                        codeCharacters[i] = codeAlphabet[codeBytes[i] & 31];
+                    options.LobbyId = new string(codeCharacters);
+
+                    (result, lobbyId) = await EOSLobbyApi.CreateLobby(options);
+                    if (result != Result.LobbyLobbyAlreadyExists)
+                        break;
+                }
+            }
             if (result != Result.Success)
                 return LobbyResponse.Failure($"EOS lobby creation failed: {result}");
 
