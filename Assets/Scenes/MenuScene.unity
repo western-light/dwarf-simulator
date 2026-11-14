@@ -2325,7 +2325,7 @@ MonoBehaviour:
   _lobbyStatus: {fileID: 953459222}
   _lobbyStatusDetails: {fileID: 1553157449}
   _connectToPurrnetInLobby: 1
-  _lobbyConnection: {fileID: 519434371}
+  _lobbyConnection: {fileID: 519434375}
 --- !u!114 &393882606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2649,12 +2649,12 @@ GameObject:
   m_Component:
   - component: {fileID: 519434374}
   - component: {fileID: 519434373}
-  - component: {fileID: 519434372}
-  - component: {fileID: 519434371}
+  - component: {fileID: 519434376}
+  - component: {fileID: 519434375}
   - component: {fileID: 519434370}
   - component: {fileID: 519434369}
   m_Layer: 0
-  m_Name: PurrTranport
+  m_Name: EOSTranport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2687,49 +2687,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PurrNet.Lobby::PurrNet.Lobby.LobbyAuthenticator
   _timeout: 5
---- !u!114 &519434371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519434368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f6c90f7e28508f4da2f42e0de860b29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PurrLobby.PurrNet::PurrNet.Lobby.PurrTransportLobbyConnection
-  _networkManager: {fileID: 519434373}
-  _authenticator: {fileID: 519434370}
-  _transport: {fileID: 519434372}
---- !u!114 &519434372
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519434368}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 332e746c3c3253246aacad4d5559f1fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.Transports.PurrTransport
-  _masterServer: https://purrtransport.purrservers.com/
-  _roomName: c83b55b039274d128817bb3e12072224
-  _region: france
-  _host: purrtransport-france.purrservers.com
-  _timeoutInSeconds: 5
-  _useNat: 1
-  _natResolveTimeout: 8
-  _networkSimulation:
-    includeInBuild: 0
-    simulateLatency: 0
-    minLatency: 30
-    maxLatency: 100
-    simulatePacketLoss: 0
-    packetLossChance: 10
-  _useWebRtcP2P: 0
-  _webRtcStunServer: stun:stun.cloudflare.com:3478
 --- !u!114 &519434373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2743,11 +2700,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkManager
   _stopPlayingOnDisconnect: 0
-  _startServerFlags: 0
-  _startClientFlags: 0
+  _startServerFlags: 1
+  _startClientFlags: 1
   _cookieScope: 1
   _dontDestroyOnLoad: 0
-  _transport: {fileID: 519434372}
+  _transport: {fileID: 519434376}
   _networkPrefabs: {fileID: 11400000, guid: 0c1a63c7b9761d74fa43d11a15b9dd3f, type: 2}
   _networkAssets: {fileID: 0}
   _networkRules: {fileID: 11400000, guid: 57ad4cc976c21074181652c4f7179d44, type: 2}
@@ -2772,6 +2729,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519434375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519434368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cf566ea95c8c09f89d4c742ff90e52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Lobby.EOS::DwarfSimulator.Lobby.EOS.EOSLobbyConnection
+  _networkManager: {fileID: 519434373}
+  _authenticator: {fileID: 519434370}
+  _transport: {fileID: 519434376}
+--- !u!114 &519434376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519434368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e220831cf81c0684caa31b14108795ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.EOSTransport.Runtime::PurrNet.EOSTransport.EOSTransport
+  _socketName: PurrNetEOS
+  _remoteProductUserId: 
+  _connectionTimeout: 5
+  _heartbeatInterval: 1
+  _logLevel: 2
 --- !u!1001 &537197973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10231,7 +10220,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 696693373318547901, guid: 559c5e2f7cecfe14f9d1e276dabd933d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6843563540068316891, guid: 559c5e2f7cecfe14f9d1e276dabd933d, type: 3}
       propertyPath: _orchestrator
