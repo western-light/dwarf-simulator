@@ -24,12 +24,7 @@ namespace DwarfSimulator.Player.Interactor
             _onSelected = onSelected;
         }
 
-        public override void OnPointerEnter(PointerEventData eventData)
-        {
-            base.OnPointerEnter(eventData);
-            Select();
-        }
-
+        public override void OnPointerEnter(PointerEventData eventData) { }
         public override void OnPointerDown(PointerEventData eventData) { }
 
         public override void OnSelect(BaseEventData eventData)

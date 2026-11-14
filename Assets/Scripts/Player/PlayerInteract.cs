@@ -1,4 +1,5 @@
 using DwarfSimulator.Player.Interactor;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -17,6 +18,7 @@ namespace DwarfSimulator.Player
         private bool _interactionOpen;
         private CursorLockMode _previousCursorLockMode;
         private bool _previousCursorVisible;
+        private CinemachineInputAxisController[] _suspendedCameraInputs;
 
         private void Awake()
         {
@@ -42,22 +44,25 @@ namespace DwarfSimulator.Player
                 return;
             }
 
-            if (!_interactionOpen && _interact.WasPressedThisFrame())
+            bool wasOpen = _interactionOpen;
+            if (!wasOpen && _interact.WasPressedThisFrame())
                 TryInteract();
 
             if (_interactionOpen)
             {
-                if (_currentInteractable == null || !_currentInteractable.isActiveAndEnabled || !_interact.enabled)
+                if (_ui == null || _currentInteractable == null || !_currentInteractable.isActiveAndEnabled ||
+                    !_interact.enabled)
                     CloseInteraction();
-                else if (_interact.WasReleasedThisFrame())
+                else
                 {
-                    if (_ui != null)
+                    if (wasOpen)
+                        _ui.UpdateSelection();
+
+                    if (_interact.WasReleasedThisFrame())
                         _ui.ConfirmInteract();
-                    else
-                        OnInteractionClosed();
+                    else if (!_interact.IsPressed())
+                        CloseInteraction();
                 }
-                else if (!_interact.IsPressed())
-                    CloseInteraction();
             }
         }
 
@@ -103,8 +108,16 @@ namespace DwarfSimulator.Player
             _previousCursorLockMode = Cursor.lockState;
             _previousCursorVisible = Cursor.visible;
             _playerMouvement.SetInteractionFrozen(true);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            _suspendedCameraInputs = FindObjectsByType<CinemachineInputAxisController>();
+            for (int i = 0; i < _suspendedCameraInputs.Length; i++)
+            {
+                if (_suspendedCameraInputs[i].enabled)
+                    _suspendedCameraInputs[i].enabled = false;
+                else
+                    _suspendedCameraInputs[i] = null;
+            }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         private void CloseInteraction()
@@ -126,6 +139,12 @@ namespace DwarfSimulator.Player
             _interactionOpen = false;
             _currentInteractable = null;
             _playerMouvement.SetInteractionFrozen(false);
+            foreach (CinemachineInputAxisController cameraInput in _suspendedCameraInputs)
+            {
+                if (cameraInput != null)
+                    cameraInput.enabled = true;
+            }
+            _suspendedCameraInputs = null;
             Cursor.lockState = _previousCursorLockMode;
             Cursor.visible = _previousCursorVisible;
         }

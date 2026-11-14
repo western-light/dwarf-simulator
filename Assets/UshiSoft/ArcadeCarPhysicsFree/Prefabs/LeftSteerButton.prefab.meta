@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 52565ed35cf27c84c888b83cca00252c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318780
+  packageName: Ushi Arcade Car Physics Free
+  packageVersion: 1.0.0
+  assetPath: Assets/UshiSoft/ArcadeCarPhysicsFree/Prefabs/LeftSteerButton.prefab
+  uploadId: 753396

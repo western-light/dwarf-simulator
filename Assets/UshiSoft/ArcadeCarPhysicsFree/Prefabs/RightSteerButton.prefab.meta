@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b099b7fc7f7f89b469e3ec96c052ac27
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318780
+  packageName: Ushi Arcade Car Physics Free
+  packageVersion: 1.0.0
+  assetPath: Assets/UshiSoft/ArcadeCarPhysicsFree/Prefabs/RightSteerButton.prefab
+  uploadId: 753396

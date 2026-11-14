@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 586e537075b9d3a42a015b5cdc7e3daf
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318780
+  packageName: Ushi Arcade Car Physics Free
+  packageVersion: 1.0.0
+  assetPath: Assets/UshiSoft/ArcadeCarPhysicsFree/Demo/TerrainData/TerrainLayer.terrainlayer
+  uploadId: 753396
