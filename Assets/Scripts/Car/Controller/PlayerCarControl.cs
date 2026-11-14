@@ -1,5 +1,6 @@
 ﻿using DwarfSimulator.Utils;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace DwarfSimulator.Car.Controller
 {
@@ -108,11 +109,15 @@ namespace DwarfSimulator.Car.Controller
                 }
             }
 
-            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
+            var keyboard = Keyboard.current;
+            if (keyboard == null)
+                return 0f;
+
+            if (keyboard.leftArrowKey.isPressed || keyboard.aKey.isPressed)
             {
                 return -1f;
             }
-            if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+            if (keyboard.rightArrowKey.isPressed || keyboard.dKey.isPressed)
             {
                 return 1f;
             }
@@ -130,7 +135,8 @@ namespace DwarfSimulator.Car.Controller
                 }
             }
 
-            if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.C))
+            var keyboard = Keyboard.current;
+            if (keyboard != null && (keyboard.upArrowKey.isPressed || keyboard.wKey.isPressed || keyboard.cKey.isPressed))
             {
                 return 1f;
             }
@@ -148,7 +154,8 @@ namespace DwarfSimulator.Car.Controller
                 }
             }
 
-            if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.X))
+            var keyboard = Keyboard.current;
+            if (keyboard != null && (keyboard.downArrowKey.isPressed || keyboard.sKey.isPressed || keyboard.xKey.isPressed))
             {
                 return 1f;
             }
