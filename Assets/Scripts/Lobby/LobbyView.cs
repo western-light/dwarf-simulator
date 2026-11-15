@@ -29,6 +29,8 @@ namespace DwarfSimulator.Lobby
 
         [SerializeField] private List<GameObject> _rocks;
         [SerializeField] private GameObject _prefabPerso;
+        [SerializeField] private Vector3 _persoOffset;
+        [SerializeField] private Vector3 _persoScale;
         [SerializeField] private TMP_InputField _lobbyCode;
         [SerializeField] ToggleElement _publicToggle;
         [Space]
@@ -831,17 +833,25 @@ namespace DwarfSimulator.Lobby
         {
             // These are local roster decorations. Normal Instantiate is rewritten
             // by PurrNet and can spawn/reject/despawn this registered player prefab.
-            var entry = UnityProxy.InstantiateDirectly(_prefabPerso, _rocks[index].transform, false);
+            var entry = UnityProxy.InstantiateDirectly(_prefabPerso, _rocks[index].transform);
             foreach (var identity in entry.GetComponentsInChildren<NetworkIdentity>(true))
             {
                 identity.skipSceneAutoSpawning = true;
                 identity.enabled = false;
             }
-            entry.transform.localPosition = Vector3.zero;
-            // entry.Setup(_lobby, player, OnKickPlayer);
+            entry.transform.localPosition = Vector3.zero + _persoOffset;
+            entry.transform.localScale = _persoScale;
+
+            TMP_Text pseudoText = entry.GetComponentInChildren<TMP_Text>(true);
+
+            if (pseudoText != null)
+            {
+                pseudoText.text = player.displayName;
+            }
+            
             _uiPlayerEntry[player] = entry;
         }
-
+        
         private void ClearPlayerEntries()
         {
             foreach (var entry in _uiPlayerEntry.Values)
