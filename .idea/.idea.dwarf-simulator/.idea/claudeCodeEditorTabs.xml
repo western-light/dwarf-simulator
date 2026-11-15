@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="86a8ea04-5a2d-46ef-b1df-147219cc06a6" />
+    <option name="activeSessionId" value="5d13a7a1-0aba-405b-bdac-af422440e7ab" />
     <option name="openSessionIds">
       <list>
         <option value="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" />
         <option value="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" />
         <option value="86a8ea04-5a2d-46ef-b1df-147219cc06a6" />
+        <option value="5d13a7a1-0aba-405b-bdac-af422440e7ab" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
+        <entry key="5d13a7a1-0aba-405b-bdac-af422440e7ab" value="/sessions/dfeb8a33-a910-4ed0-80c1-5047e620b39e" />
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="/sessions/f16326b4-d35b-4193-99bd-329bcbf308ba" />
         <entry key="86a8ea04-5a2d-46ef-b1df-147219cc06a6" value="/sessions/e48c968b-6e2e-4733-95d1-a90d2fef6297" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="/sessions/new" />
@@ -18,6 +20,7 @@
     </option>
     <option name="sessionTitles">
       <map>
+        <entry key="5d13a7a1-0aba-405b-bdac-af422440e7ab" value="Bugs voiture et contrôle" />
         <entry key="67f3e5c0-32ce-47f2-8c26-127b6b4f148f" value="Fonctionnement asmdef" />
         <entry key="86a8ea04-5a2d-46ef-b1df-147219cc06a6" value="Système de contrôle de voiture buggé sur le réseau" />
         <entry key="ab4d0ab4-4c16-4d2e-8f1c-35407ec150a4" value="Claude Code" />

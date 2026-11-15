@@ -205,6 +205,7 @@ namespace DwarfSimulator.Car.Controller
 
             if (!IsGrounded())
             {
+                _angularVelocity = _rigidbody.angularVelocity.y;
                 return;
             }
 

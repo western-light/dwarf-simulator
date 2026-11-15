@@ -88,7 +88,8 @@ namespace DwarfSimulator.Car.Controller
                 _remoteThrottle = 0f;
                 _remoteBrake = 0f;
                 _carController.ThrottleInput = 0f;
-                _carController.BrakeInput = 0f;
+                _carController.BrakeInput = 1f;
+                _carController.Reverse = false;
             }
         }
 

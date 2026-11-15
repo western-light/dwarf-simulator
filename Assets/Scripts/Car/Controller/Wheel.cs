@@ -46,6 +46,9 @@ namespace DwarfSimulator.Car.Controller
 
         private Vector3 _totalForce;
 
+        private Vector3 _lastCenter;
+        private bool _hasLastCenter;
+
         public float SteerAngle
         {
             get => _steerAngle;
@@ -125,7 +128,10 @@ namespace DwarfSimulator.Car.Controller
             UpdateSuspensionCompression();
 
             AddSuspensionForce();
+        }
 
+        private void LateUpdate()
+        {
             UpdateModel();
         }
 
@@ -250,14 +256,25 @@ namespace DwarfSimulator.Car.Controller
                 return;
             }
 
-            if (_grounded)
-            {
-                var vel = _rigidbody.GetPointVelocity(_hitInfo.point);
+            var center = Center;
+            var dt = Time.deltaTime;
 
-                if (_hitInfo.collider.attachedRigidbody != null)
+            if (_grounded && dt > 0f)
+            {
+                Vector3 vel;
+                if (_rigidbody.isKinematic)
                 {
-                    var contactVel = _hitInfo.collider.attachedRigidbody.GetPointVelocity(_hitInfo.point);
-                    vel -= contactVel;
+                    vel = _hasLastCenter ? (center - _lastCenter) / dt : Vector3.zero;
+                }
+                else
+                {
+                    vel = _rigidbody.GetPointVelocity(_hitInfo.point);
+
+                    if (_hitInfo.collider != null && _hitInfo.collider.attachedRigidbody != null)
+                    {
+                        var contactVel = _hitInfo.collider.attachedRigidbody.GetPointVelocity(_hitInfo.point);
+                        vel -= contactVel;
+                    }
                 }
 
                 var forwardVel = Vector3.Dot(vel, Forward);
@@ -265,9 +282,12 @@ namespace DwarfSimulator.Car.Controller
                 _angularVelocity = forwardVel / _radius;
             }
 
-            _angle += _angularVelocity * Time.fixedDeltaTime * Mathf.Rad2Deg;
+            _lastCenter = center;
+            _hasLastCenter = true;
 
-            _model.position = Center;
+            _angle = Mathf.Repeat(_angle + _angularVelocity * dt * Mathf.Rad2Deg, 360f);
+
+            _model.position = center;
             _model.rotation = Rotation;
         }
     }

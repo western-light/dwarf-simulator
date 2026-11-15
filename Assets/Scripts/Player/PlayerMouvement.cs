@@ -20,29 +20,23 @@ namespace DwarfSimulator.Player
         private Transform _playerCamera;
         
         private Vector3 _lastMoveDirection;
-        private Transform _parent;
         private bool _freeze;
         private bool _interactionFrozen;
 
-        void Start()
+        void Awake()
         {
             _rb = GetComponent<Rigidbody>();
             _col = GetComponent<Collider>();
             _anim = GetComponent<Animator>();
+        }
+
+        void Start()
+        {
             _playerCamera = Camera.main.transform;
             _moveAction = InputSystem.actions.FindAction("Move");
             _runAction = InputSystem.actions.FindAction("Sprint");
             _jumpAction = InputSystem.actions.FindAction("Jump");
             
-        }
-
-        void Update()
-        {
-            if (_parent != null)
-            {
-                transform.position = _parent.position;
-                transform.rotation = _parent.rotation;
-            }
         }
 
         void FixedUpdate()
@@ -67,8 +61,8 @@ namespace DwarfSimulator.Player
             _anim.SetBool("Run", run);
             
             _rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
-            Quaternion targetRotation = Quaternion.LookRotation(_lastMoveDirection);
-            _rb.MoveRotation(targetRotation);
+            if (_lastMoveDirection.sqrMagnitude > 0.01f)
+                _rb.MoveRotation(Quaternion.LookRotation(_lastMoveDirection));
             
             if (_jumpAction.IsPressed() && IsGrounded())
             {
@@ -86,18 +80,25 @@ namespace DwarfSimulator.Player
         
         public void Freeze() => _freeze = true;
         public void SetInteractionFrozen(bool value) => _interactionFrozen = value;
-        public void Freeze(Vector3 position, Quaternion rotation)
-        {
-            _freeze = true;
-            _lastMoveDirection = new Vector3(0, 0, 0);
-            transform.position = position;
-            transform.rotation = rotation;
-        }
         public void UnFreeze() => _freeze = false;
 
-        public void SyncTransform(Transform parent)
+        public void Release(Vector3 position, Vector3 forward)
         {
-            _parent = parent;
+            forward = Vector3.ProjectOnPlane(forward, Vector3.up);
+            if (forward.sqrMagnitude < 0.0001f)
+                forward = Vector3.forward;
+            forward.Normalize();
+
+            _lastMoveDirection = forward;
+            transform.SetPositionAndRotation(position, Quaternion.LookRotation(forward));
+            _rb.position = position;
+            _rb.rotation = transform.rotation;
+            if (!_rb.isKinematic)
+            {
+                _rb.linearVelocity = Vector3.zero;
+                _rb.angularVelocity = Vector3.zero;
+            }
+            _freeze = false;
         }
     }
 }
