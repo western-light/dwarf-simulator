@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using PurrNet.Lobby;
 using PurrNet.UI;
@@ -16,6 +17,7 @@ namespace DwarfSimulator.Lobby
 
         [SerializeField] private GameObject _mainMenuContent;
         [SerializeField] private GameObject _joinMenuContent;
+        [SerializeField] private GameObject _customiseMenuContent;
         [SerializeField] private TMP_InputField _codeField;
         [SerializeField] private string _lobbyName = "Dwarf_Simulator";
         [SerializeField] private int _maxPlayer = 4;
@@ -127,14 +129,28 @@ namespace DwarfSimulator.Lobby
 
         public void showJoinMenu()
         {
+            _customiseMenuContent.SetActive(false);
             _mainMenuContent.SetActive(false);
             _joinMenuContent.SetActive(true);
         }
 
         public void showMainMenu()
         {
-            _mainMenuContent.SetActive(true);
+            _customiseMenuContent.SetActive(false);
             _joinMenuContent.SetActive(false);
+            _mainMenuContent.SetActive(true);
+        }
+
+        public void showCustomiseMenu()
+        {
+            _customiseMenuContent.SetActive(true);
+            _mainMenuContent.SetActive(false);
+            _joinMenuContent.SetActive(false);
+
+            Canvas.ForceUpdateCanvases();
+
+            RectTransform rect = _customiseMenuContent.GetComponent<RectTransform>();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
         }
 
         public void GoToSettings()

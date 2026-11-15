@@ -737,6 +737,16 @@ namespace DwarfSimulator.Lobby
 
         private void OnPlayerUpdated(IPlayer player)
         {
+            if (_closingLobby || _lobby == null)
+                return;
+
+            if (_uiPlayerEntry.TryGetValue(player, out var entry) && entry)
+            {
+                var pseudoText = entry.GetComponentInChildren<TMP_Text>(true);
+                if (pseudoText != null)
+                    pseudoText.text = player.displayName;
+            }
+
             UpdateLocalPlayerData(_lobby);
         }
 

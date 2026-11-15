@@ -341,7 +341,8 @@ namespace DwarfSimulator.Lobby.EOS
         private static string LocalDisplayName()
         {
             var orchestrator = GameOrchestrator.active;
-            return orchestrator && orchestrator.sessionProvider ? orchestrator.sessionProvider.playerName : null;
+            var displayName = orchestrator && orchestrator.sessionProvider ? orchestrator.sessionProvider.playerName : null;
+            return string.IsNullOrWhiteSpace(displayName) ? SystemInfo.deviceName : displayName;
         }
 
         private static string DescribeJoinResult(Result result)
