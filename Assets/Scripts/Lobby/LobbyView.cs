@@ -509,6 +509,7 @@ namespace DwarfSimulator.Lobby
 
         private void OnMetadata(string key, string value)
         {
+            Debug.Log($"[METADATA] Key={key} | Value={value}");
             if (_lobby == null || _closingLobby)
                 return;
 
@@ -521,13 +522,31 @@ namespace DwarfSimulator.Lobby
 
             if (key.StartsWith(CUSTOM_KEY))
             {
+                Debug.Log($"[CUSTOM] Données réseau reçues : {key} = {value}");
+
                 foreach (var player in _lobby.players)
                 {
-                    if (GetCustomKey(player) == key)
-                    {
-                        RefreshPlayerCustomisation(player);
+                    if (GetCustomKey(player) != key)
+                        continue;
+
+                    if (!_uiPlayerEntry.TryGetValue(player, out var entry))
                         break;
-                    }
+
+                    if (!entry || string.IsNullOrEmpty(value))
+                        break;
+
+                    var loader = entry.GetComponent<PlayerCustomisationLoader>();
+
+                    if (loader == null)
+                        break;
+
+                    PlayerCustomisation data =
+                        JsonUtility.FromJson<PlayerCustomisation>(value);
+
+                    loader.ApplyCustomisation(data);
+
+                    Debug.Log($"[CUSTOM] Avatar actualisé : {player.id}");
+                    break;
                 }
 
                 return;
@@ -696,8 +715,8 @@ namespace DwarfSimulator.Lobby
                 _lobbyConnection.OnPlayerRegistered(player);
 
             Debug.Log($"[Lobby] EOS member={player.id}, local EOS={_localPlayerId}, members={_lobby.players.Count}", this);
-            RenderPlayerList(_lobby);
             PublishLocalCustomisation();
+            RenderPlayerList(_lobby);
         }
 
         private void OnPlayerLeft(IPlayer player)
