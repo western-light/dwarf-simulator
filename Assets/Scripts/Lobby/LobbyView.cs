@@ -8,6 +8,8 @@ using UnityEngine;
 using PurrNet.Lobby;
 using PurrNet;
 using PurrNet.Transports;
+using DwarfSimulator.Player;
+
 #if !EOS_DISABLE
 using Epic.OnlineServices;
 using Epic.OnlineServices.Lobby;
@@ -19,6 +21,8 @@ namespace DwarfSimulator.Lobby
     [DefaultExecutionOrder(1000)]
     public class LobbyView : MonoBehaviour
     {
+        private const string CUSTOM_KEY = "CUSTOM_";
+
         public const string LOBBY_STATUS_STRING = "LOBBY_STATUS_STRING";
         public const string LOBBY_STATUS_DETAILS_STRING = "LOBBY_STATUS_DETAILS_STRING";
         public const string LOBBY_CONN_INFO = GameStartKeys.ConnInfo;
@@ -123,6 +127,7 @@ namespace DwarfSimulator.Lobby
 
             _lobby.lobbyData.onDataChanged += OnMetadata;
 
+            PublishLocalCustomisation();
             showRock();
             RenderPlayerList(lobby);
             _lobbyCode.text = lobby.joinCode;
@@ -514,6 +519,20 @@ namespace DwarfSimulator.Lobby
                 return;
             }
 
+            if (key.StartsWith(CUSTOM_KEY))
+            {
+                foreach (var player in _lobby.players)
+                {
+                    if (GetCustomKey(player) == key)
+                    {
+                        RefreshPlayerCustomisation(player);
+                        break;
+                    }
+                }
+
+                return;
+            }
+
             if (_lobby.isOwner)
                 return;
 
@@ -678,6 +697,7 @@ namespace DwarfSimulator.Lobby
 
             Debug.Log($"[Lobby] EOS member={player.id}, local EOS={_localPlayerId}, members={_lobby.players.Count}", this);
             RenderPlayerList(_lobby);
+            PublishLocalCustomisation();
         }
 
         private void OnPlayerLeft(IPlayer player)
@@ -860,6 +880,28 @@ namespace DwarfSimulator.Lobby
             }
             
             _uiPlayerEntry[player] = entry;
+
+            // RefreshPlayerCustomisation(player);
+
+            var loader = entry.GetComponent<PlayerCustomisationLoader>();
+
+            if (loader == null)
+            {
+                Debug.LogError("[CUSTOM] Loader introuvable !");
+                return;
+            }
+
+            if (player.id == _lobby.localPlayer.id)
+            {
+                loader.ApplyCustomisation(
+                    PlayerCustomisationLoader.LoadLocal()
+                );
+            }
+            else
+            {
+                // Autres personnages : données réseau
+                RefreshPlayerCustomisation(player);
+            }
         }
         
         private void ClearPlayerEntries()
@@ -874,10 +916,115 @@ namespace DwarfSimulator.Lobby
             }
             _uiPlayerEntry.Clear();
         }
+        
+        #region Player Customisation
 
-        // private void OnKickPlayer(IPlayer target)
+        private string GetCustomKey(IPlayer player)
+        {
+            return CUSTOM_KEY + player.id;
+        }
+
+        private void PublishLocalCustomisation()
+        {
+            if (_lobby?.localPlayer == null)
+                return;
+
+            PlayerCustomisation data =
+                PlayerCustomisationLoader.LoadLocal();
+
+            string json = JsonUtility.ToJson(data);
+
+            _lobby.lobbyData.SetData(
+                GetCustomKey(_lobby.localPlayer),
+                json
+            );
+        }
+
+        // private void RefreshPlayerCustomisation(IPlayer player)
         // {
-        //     _lobby.KickPlayer(target);
+        //     Debug.Log("[TEST] Start refresh");
+        //     if (player == null)
+        //         return;
+        //     Debug.Log("[TEST] refresh 1");
+
+        //     if (!_uiPlayerEntry.TryGetValue(player, out var entry))
+        //         return;
+        //     Debug.Log("[TEST] refresh 2");
+
+        //     if (!entry)
+        //         return;
+        //     Debug.Log("[TEST] refresh 3");
+
+        //     string key = GetCustomKey(player);
+
+        //     if (!_lobby.lobbyData.TryGetData(key, out string json))
+        //         return;
+        //     Debug.Log("[TEST] refresh 4");
+
+        //     if (string.IsNullOrEmpty(json))
+        //         return;
+        //     Debug.Log("[TEST] refresh 5");
+
+        //     PlayerCustomisation data =
+        //         JsonUtility.FromJson<PlayerCustomisation>(json);
+
+        //     var loader = entry.GetComponent<PlayerCustomisationLoader>();
+
+        //     if (loader != null)
+        //     {
+        //         loader.ApplyCustomisation(data);
+        //     }
+        //     Debug.Log("[TEST] finish refresh");
         // }
+
+        private void RefreshPlayerCustomisation(IPlayer player)
+        {
+            if (player == null || _lobby == null)
+                return;
+
+            if (!_uiPlayerEntry.TryGetValue(player, out var entry))
+            {
+                Debug.LogWarning($"[CUSTOM] Entry introuvable pour {player.id}");
+                return;
+            }
+
+            if (!entry)
+                return;
+
+            string key = GetCustomKey(player);
+
+            Debug.Log($"[CUSTOM] Recherche de la clé : {key}");
+
+            if (!_lobby.lobbyData.TryGetData(key, out string json))
+            {
+                Debug.LogWarning($"[CUSTOM] Données introuvables pour {player.id}");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(json))
+            {
+                Debug.LogWarning($"[CUSTOM] JSON vide pour {player.id}");
+                return;
+            }
+
+            Debug.Log($"[CUSTOM] Données reçues : {json}");
+
+            PlayerCustomisation data =
+                JsonUtility.FromJson<PlayerCustomisation>(json);
+
+            var loader = entry.GetComponent<PlayerCustomisationLoader>();
+
+            if (loader == null)
+            {
+                Debug.LogError("[CUSTOM] PlayerCustomisationLoader introuvable !");
+                return;
+            }
+
+            loader.ApplyCustomisation(data);
+
+            Debug.Log($"[CUSTOM] Personnalisation appliquée à {player.id}");
+        }
+
+        #endregion
     }
 }

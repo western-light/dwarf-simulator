@@ -490,6 +490,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5890964446730008987, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6028781679281805259, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
       propertyPath: m_Controller
       value: 
@@ -509,10 +513,56 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5296001090189006984, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7905110466914450991}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1009215913774552843, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8994500088437483563}
   m_SourcePrefab: {fileID: 100100000, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+--- !u!1 &139247329833570442 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6509802327236745645, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+  m_PrefabInstance: {fileID: 6609527287191947559}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1353031392914559407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5296001090189006984, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
   m_PrefabInstance: {fileID: 6609527287191947559}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6176887594042252844 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1009215913774552843, guid: f8efee91334343d3b88269b1f6230b29, type: 3}
+  m_PrefabInstance: {fileID: 6609527287191947559}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8994500088437483563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6176887594042252844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0efea702ca965d15bb163b8e18c21d59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PersoCustomisationLoader
+  _colorValues:
+  - {r: 1, g: 0.8816934, b: 0, a: 0}
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0.015245736, a: 0}
+  - {r: 0.96872926, g: 0, b: 1, a: 0}
+  _bodyForColor: {fileID: 139247329833570442}
+  _beardValues:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _hairValues:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _capeValues:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
