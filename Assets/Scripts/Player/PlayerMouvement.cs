@@ -14,17 +14,18 @@ namespace DwarfSimulator.Player
         private InputAction _moveAction;
         private InputAction _runAction;
         private InputAction _jumpAction;
+        private Player _player;
         private Rigidbody _rb;
         private Animator _anim;
         private Collider _col;
         private Transform _playerCamera;
         
         private Vector3 _lastMoveDirection;
-        private bool _freeze;
         private bool _interactionFrozen;
 
         void Awake()
         {
+            _player = GetComponent<Player>();
             _rb = GetComponent<Rigidbody>();
             _col = GetComponent<Collider>();
             _anim = GetComponent<Animator>();
@@ -41,10 +42,11 @@ namespace DwarfSimulator.Player
 
         void FixedUpdate()
         {
-            if (_freeze || _interactionFrozen)
+            if (_player.IsSeated || _interactionFrozen)
             {
                 _anim.SetBool("Walk", false);
                 _anim.SetBool("Run", false);
+                _lastMoveDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
                 return;
             }
             
@@ -78,27 +80,6 @@ namespace DwarfSimulator.Player
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         }
         
-        public void Freeze() => _freeze = true;
         public void SetInteractionFrozen(bool value) => _interactionFrozen = value;
-        public void UnFreeze() => _freeze = false;
-
-        public void Release(Vector3 position, Vector3 forward)
-        {
-            forward = Vector3.ProjectOnPlane(forward, Vector3.up);
-            if (forward.sqrMagnitude < 0.0001f)
-                forward = Vector3.forward;
-            forward.Normalize();
-
-            _lastMoveDirection = forward;
-            transform.SetPositionAndRotation(position, Quaternion.LookRotation(forward));
-            _rb.position = position;
-            _rb.rotation = transform.rotation;
-            if (!_rb.isKinematic)
-            {
-                _rb.linearVelocity = Vector3.zero;
-                _rb.angularVelocity = Vector3.zero;
-            }
-            _freeze = false;
-        }
     }
 }

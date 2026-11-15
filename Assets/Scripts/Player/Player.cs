@@ -3,13 +3,15 @@ using UnityEngine;
 
 namespace DwarfSimulator.Player
 {
-    public class Player : NetworkBehaviour
+    [RequireComponent(typeof(NetworkTransform), typeof(Rigidbody), typeof(Collider))]
+    public class Player : PlayerIdentity<Player>
     {
         private Collider _collider;
         private Rigidbody _rigidbody;
         private NetworkTransform _networkTransform;
-        private bool _wasKinematic;
-        private bool _seated;
+
+        public Transform Seat { get; private set; }
+        public bool IsSeated => Seat != null;
 
         private void Awake()
         {
@@ -20,60 +22,28 @@ namespace DwarfSimulator.Player
 
         public void SitIn(Transform seat)
         {
-            if (transform.parent == seat)
-                return;
-
-            SetLocalParent(seat, false);
-            transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-
-            if (_networkTransform != null && !_networkTransform.isController)
-                _networkTransform.ClearInterpolation(Vector3.zero, Quaternion.identity, null);
+            Seat = seat;
+            _networkTransform.enabled = false;
+            _collider.enabled = false;
+            _rigidbody.isKinematic = true;
+            FollowSeat();
         }
 
-        public void LeaveSeat()
+        public void GetOut(Vector3 position, Quaternion rotation)
         {
-            if (transform.parent == null)
-                return;
-
-            SetLocalParent(null, true);
-
-            if (_networkTransform != null && !_networkTransform.isController)
-                _networkTransform.ClearInterpolation(transform.position, transform.rotation, null);
+            Seat = null;
+            _collider.enabled = true;
+            _rigidbody.isKinematic = false;
+            transform.SetPositionAndRotation(position, rotation);
+            _networkTransform.enabled = true;
         }
 
-        private void SetLocalParent(Transform parent, bool worldPositionStays)
+        private void LateUpdate() => FollowSeat();
+
+        private void FollowSeat()
         {
-            if (_networkTransform != null)
-                _networkTransform.StartIgnoringParentChanges();
-
-            transform.SetParent(parent, worldPositionStays);
-
-            if (_networkTransform != null)
-                _networkTransform.StopIgnoringParentChanges();
-        }
-
-        private void OnTransformParentChanged()
-        {
-            bool seated = transform.parent != null;
-            if (seated == _seated)
-                return;
-            _seated = seated;
-
-            if (_collider != null)
-                _collider.enabled = !seated;
-
-            if (_rigidbody == null)
-                return;
-
-            if (seated)
-            {
-                _wasKinematic = _rigidbody.isKinematic;
-                _rigidbody.isKinematic = true;
-            }
-            else
-            {
-                _rigidbody.isKinematic = _wasKinematic;
-            }
+            if (Seat != null)
+                transform.SetPositionAndRotation(Seat.position, Seat.rotation);
         }
     }
 }
