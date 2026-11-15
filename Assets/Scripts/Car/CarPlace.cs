@@ -20,7 +20,8 @@ namespace DwarfSimulator.Car
         private CarControllerBase _carController;
         private PlayerCarControl _playerCarControl;
         private InputAction _leaveAction;
-        private Player.Player _seatedLocalPlayer;
+        private Player.Player _topOccupant;
+        private Player.Player _bottomOccupant;
         private Vector3 _lastInput;
         private float _visualSteer;
 
@@ -59,13 +60,21 @@ namespace DwarfSimulator.Car
                 UpdateControlMode();
                 networkManager.playerModule.onPlayerLeft += OnPlayerLeft;
             }
+
+            RefreshSeats();
         }
 
         protected override void OnDespawned()
         {
             _topDriver.onChanged -= OnSeatsChanged;
             _bottomDriver.onChanged -= OnSeatsChanged;
-            GetOut();
+
+            var topOccupant = _topOccupant;
+            var bottomOccupant = _bottomOccupant;
+            _topOccupant = null;
+            _bottomOccupant = null;
+            GetOut(topOccupant);
+            GetOut(bottomOccupant);
 
             if (networkManager == null)
                 return;
@@ -135,51 +144,62 @@ namespace DwarfSimulator.Car
             _playerCarControl.SetControlMode(mode);
         }
 
-        private Transform LocalSeat
+        private bool IsLocalPlayerSeated =>
+            (_topOccupant != null && _topOccupant.isOwner) ||
+            (_bottomOccupant != null && _bottomOccupant.isOwner);
+
+        private void OnSeatsChanged(PlayerID? _) => RefreshSeats();
+
+        private void RefreshSeats()
         {
-            get
-            {
-                if (!localPlayer.HasValue)
-                    return null;
-                if (_topDriver.value == localPlayer)
-                    return top;
-                if (_bottomDriver.value == localPlayer)
-                    return bottom;
+            var newTop = ResolveOccupant(_topOccupant, _topDriver.value);
+            var newBottom = ResolveOccupant(_bottomOccupant, _bottomDriver.value);
+
+            if (_topOccupant != null && _topOccupant != newTop && _topOccupant != newBottom)
+                GetOut(_topOccupant);
+            if (_bottomOccupant != null && _bottomOccupant != newTop && _bottomOccupant != newBottom)
+                GetOut(_bottomOccupant);
+
+            _topOccupant = newTop;
+            _bottomOccupant = newBottom;
+
+            if (newTop != null)
+                SitIn(newTop, top);
+            if (newBottom != null)
+                SitIn(newBottom, bottom);
+        }
+
+        private static Player.Player ResolveOccupant(Player.Player current, PlayerID? driver)
+        {
+            if (!driver.HasValue)
                 return null;
-            }
+            if (current != null && current.owner == driver)
+                return current;
+            return FindPlayer(driver.Value);
         }
 
-        private void OnSeatsChanged(PlayerID? _)
+        private void SitIn(Player.Player player, Transform seat)
         {
-            var seat = LocalSeat;
-            if (seat == null)
+            if (player.transform.parent == seat)
+                return;
+
+            if (player.isOwner)
             {
-                GetOut();
-                return;
+                _lastInput = Vector3.zero;
+                if (player.TryGetComponent(out PlayerMouvement movement))
+                    movement.Freeze();
             }
 
-            if (_seatedLocalPlayer == null)
-                _seatedLocalPlayer = FindLocalPlayer();
-            if (_seatedLocalPlayer == null || _seatedLocalPlayer.transform.parent == seat)
-                return;
-
-            _lastInput = Vector3.zero;
-            if (_seatedLocalPlayer.TryGetComponent(out PlayerMouvement movement))
-                movement.Freeze();
-
-            _seatedLocalPlayer.transform.SetParent(seat, false);
-            _seatedLocalPlayer.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+            player.SitIn(seat);
         }
 
-        private void GetOut()
+        private void GetOut(Player.Player player)
         {
-            var player = _seatedLocalPlayer;
-            _seatedLocalPlayer = null;
             if (player == null)
                 return;
 
-            player.transform.SetParent(null, true);
-            if (player.TryGetComponent(out PlayerMouvement movement))
+            player.LeaveSeat();
+            if (player.isOwner && player.TryGetComponent(out PlayerMouvement movement))
                 movement.Release(GetExitPosition(), transform.forward);
         }
 
@@ -188,7 +208,11 @@ namespace DwarfSimulator.Car
             if (!isSpawned)
                 return;
 
-            if (_seatedLocalPlayer != null && _leaveAction != null && _leaveAction.WasPressedThisFrame())
+            if ((_topDriver.value.HasValue && _topOccupant == null) ||
+                (_bottomDriver.value.HasValue && _bottomOccupant == null))
+                RefreshSeats();
+
+            if (IsLocalPlayerSeated && _leaveAction != null && _leaveAction.WasPressedThisFrame())
                 LeaveSeatRpc();
 
             if (!isServer)
@@ -247,11 +271,11 @@ namespace DwarfSimulator.Car
             return transform.position + side * (halfWidth + exitSideOffset) + Vector3.up * 0.5f;
         }
 
-        private static Player.Player FindLocalPlayer()
+        private static Player.Player FindPlayer(PlayerID id)
         {
             foreach (var player in FindObjectsByType<Player.Player>())
             {
-                if (player.isOwner)
+                if (player.owner == id)
                     return player;
             }
             return null;
