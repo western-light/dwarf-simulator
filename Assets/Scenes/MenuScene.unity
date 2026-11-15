@@ -3172,6 +3172,7 @@ MonoBehaviour:
   _persoScale: {x: 0.1, y: 0.1, z: 0.1}
   _lobbyCode: {fileID: 1893272810}
   _publicToggle: {fileID: 1345761336}
+  _startButton: {fileID: 212582293}
   _lobbyManager: {fileID: 393882606}
   _microphoneButton: {fileID: 956403493}
   _microphoneText: {fileID: 921276217}

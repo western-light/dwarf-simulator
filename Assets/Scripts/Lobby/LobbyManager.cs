@@ -468,7 +468,6 @@ namespace DwarfSimulator.Lobby
                      status == MatchmakingStatus.Failed)
                 _currentTicket = null;
 
-            Debug.Log($"[Lobby] Matchmaking: {status}", this);
             // TODO : 
             // _message.text = $"Matchmaking: {status}";
 

@@ -21,7 +21,7 @@ namespace DwarfSimulator.Lobby
     [DefaultExecutionOrder(1000)]
     public class LobbyView : MonoBehaviour
     {
-        private const string CUSTOM_KEY = "CUSTOM_";
+        private const string CUSTOM_KEY = "CUSTOM";
 
         public const string LOBBY_STATUS_STRING = "LOBBY_STATUS_STRING";
         public const string LOBBY_STATUS_DETAILS_STRING = "LOBBY_STATUS_DETAILS_STRING";
@@ -37,6 +37,7 @@ namespace DwarfSimulator.Lobby
         [SerializeField] private Vector3 _persoScale;
         [SerializeField] private TMP_InputField _lobbyCode;
         [SerializeField] ToggleElement _publicToggle;
+        [SerializeField] private GameObject _startButton;
         [Space]
 
 
@@ -111,7 +112,6 @@ namespace DwarfSimulator.Lobby
             _orchestrator.activeLobby = lobby;
             _isPublic = ReadPublicVisibility(lobby);
             RefreshPublicToggle();
-            Debug.Log($"[Lobby] Lobby={lobby.id}, local EOS={lobby.localPlayer?.id}, host EOS={lobby.owner?.id}, members={lobby.players.Count}", this);
 
             // Destruction is terminal and replays on subscription. Observe it before
             // replaying player joins, which can otherwise start a transient connection
@@ -306,6 +306,7 @@ namespace DwarfSimulator.Lobby
 
         private void RefreshPublicToggle()
         {
+            RefreshOwnerControls();
             if (!_publicToggle)
                 return;
 
@@ -318,6 +319,26 @@ namespace DwarfSimulator.Lobby
             {
                 _syncingPublicToggle = false;
             }
+        }
+
+        private void RefreshOwnerControls()
+        {
+            bool isOwner = _lobby?.isOwner == true && !_closingLobby;
+            if (_publicToggle)
+                SetOwnerControlState(_publicToggle.transform.parent.gameObject, isOwner);
+            SetOwnerControlState(_startButton, isOwner);
+        }
+
+        private static void SetOwnerControlState(GameObject control, bool isOwner)
+        {
+            if (!control)
+                return;
+
+            if (!control.TryGetComponent<CanvasGroup>(out var group))
+                group = control.AddComponent<CanvasGroup>();
+            group.alpha = isOwner ? 1f : 0.4f;
+            group.interactable = isOwner;
+            group.blocksRaycasts = isOwner;
         }
 
         private static bool ReadPublicVisibility(ILobby lobby)
@@ -362,7 +383,6 @@ namespace DwarfSimulator.Lobby
 
                 _isPublic = isPublic;
                 targetLobby.lobbyData.SetData(LOBBY_PUBLIC, isPublic ? "1" : "0");
-                Debug.Log($"[Lobby] Visibility={(isPublic ? "public (1)" : "private (0)")}", this);
             }
             finally
             {
@@ -475,9 +495,6 @@ namespace DwarfSimulator.Lobby
                 if (manager.serverState != ConnectionState.Disconnected &&
                     manager.serverState != ConnectionState.Disconnecting)
                     manager.StopServer();
-                manager.onClientConnectionState -= OnLobbyClientConnectionState;
-                manager.onServerConnectionState -= OnLobbyServerConnectionState;
-                manager.onPlayerJoined -= OnNetworkPlayerJoined;
             }
         }
 
@@ -492,24 +509,8 @@ namespace DwarfSimulator.Lobby
             return _networkManager;
         }
 
-        private void OnLobbyClientConnectionState(ConnectionState state)
-        {
-            Debug.Log($"[Lobby] Client={state}, local EOS={_lobby?.localPlayer?.id}, host EOS={_connectedHostId}", this);
-        }
-
-        private void OnLobbyServerConnectionState(ConnectionState state)
-        {
-            Debug.Log($"[Lobby] Listening={state}, local EOS={_lobby?.localPlayer?.id}", this);
-        }
-
-        private void OnNetworkPlayerJoined(PlayerID player, bool isReconnect, bool asServer)
-        {
-            Debug.Log($"[Lobby] PurrNet player registered={player}, asServer={asServer}, local EOS={_localPlayerId}", this);
-        }
-
         private void OnMetadata(string key, string value)
         {
-            Debug.Log($"[METADATA] Key={key} | Value={value}");
             if (_lobby == null || _closingLobby)
                 return;
 
@@ -517,38 +518,6 @@ namespace DwarfSimulator.Lobby
             {
                 _isPublic = value == "1";
                 RefreshPublicToggle();
-                return;
-            }
-
-            if (key.StartsWith(CUSTOM_KEY))
-            {
-                Debug.Log($"[CUSTOM] Données réseau reçues : {key} = {value}");
-
-                foreach (var player in _lobby.players)
-                {
-                    if (GetCustomKey(player) != key)
-                        continue;
-
-                    if (!_uiPlayerEntry.TryGetValue(player, out var entry))
-                        break;
-
-                    if (!entry || string.IsNullOrEmpty(value))
-                        break;
-
-                    var loader = entry.GetComponent<PlayerCustomisationLoader>();
-
-                    if (loader == null)
-                        break;
-
-                    PlayerCustomisation data =
-                        JsonUtility.FromJson<PlayerCustomisation>(value);
-
-                    loader.ApplyCustomisation(data);
-
-                    Debug.Log($"[CUSTOM] Avatar actualisé : {player.id}");
-                    break;
-                }
-
                 return;
             }
 
@@ -643,7 +612,6 @@ namespace DwarfSimulator.Lobby
             catch (Exception e)
             {
                 Toaster.PushError("Failed to start game", e);
-                Debug.LogError("Failed to start game");
                 Debug.LogException(e, _orchestrator.gameAllocator);
                 if (this && !_closingLobby)
                     ResetStartState();
@@ -714,7 +682,6 @@ namespace DwarfSimulator.Lobby
             if (_lobbyConnected)
                 _lobbyConnection.OnPlayerRegistered(player);
 
-            Debug.Log($"[Lobby] EOS member={player.id}, local EOS={_localPlayerId}, members={_lobby.players.Count}", this);
             PublishLocalCustomisation();
             RenderPlayerList(_lobby);
         }
@@ -751,16 +718,6 @@ namespace DwarfSimulator.Lobby
                 _lobbyConnected = true;
                 try
                 {
-                    var manager = ResolveNetworkManager();
-                    if (manager)
-                    {
-                        manager.onClientConnectionState -= OnLobbyClientConnectionState;
-                        manager.onServerConnectionState -= OnLobbyServerConnectionState;
-                        manager.onPlayerJoined -= OnNetworkPlayerJoined;
-                        manager.onClientConnectionState += OnLobbyClientConnectionState;
-                        manager.onServerConnectionState += OnLobbyServerConnectionState;
-                        manager.onPlayerJoined += OnNetworkPlayerJoined;
-                    }
                     _lobbyConnection.JoinedLobby(lobby);
                     // Membership can become available after the owner event was
                     // replayed. Bootstrap explicitly once both are known.
@@ -786,6 +743,7 @@ namespace DwarfSimulator.Lobby
                     pseudoText.text = player.displayName;
             }
 
+            RefreshPlayerCustomisation(player);
             UpdateLocalPlayerData(_lobby);
         }
 
@@ -810,6 +768,7 @@ namespace DwarfSimulator.Lobby
 
         private void OnOwnerChanged(IPlayer host)
         {
+            RefreshOwnerControls();
             if (_closingLobby || _loadingGame || host == null || !_lobbyConnected || !_lobbyConnection ||
                 _connectedHostId == host.id)
                 return;
@@ -900,8 +859,6 @@ namespace DwarfSimulator.Lobby
             
             _uiPlayerEntry[player] = entry;
 
-            // RefreshPlayerCustomisation(player);
-
             var loader = entry.GetComponent<PlayerCustomisationLoader>();
 
             if (loader == null)
@@ -938,11 +895,6 @@ namespace DwarfSimulator.Lobby
         
         #region Player Customisation
 
-        private string GetCustomKey(IPlayer player)
-        {
-            return CUSTOM_KEY + player.id;
-        }
-
         private void PublishLocalCustomisation()
         {
             if (_lobby?.localPlayer == null)
@@ -953,80 +905,22 @@ namespace DwarfSimulator.Lobby
 
             string json = JsonUtility.ToJson(data);
 
-            _lobby.lobbyData.SetData(
-                GetCustomKey(_lobby.localPlayer),
+            _lobby.localPlayer.userData.SetData(
+                CUSTOM_KEY,
                 json
             );
         }
-
-        // private void RefreshPlayerCustomisation(IPlayer player)
-        // {
-        //     Debug.Log("[TEST] Start refresh");
-        //     if (player == null)
-        //         return;
-        //     Debug.Log("[TEST] refresh 1");
-
-        //     if (!_uiPlayerEntry.TryGetValue(player, out var entry))
-        //         return;
-        //     Debug.Log("[TEST] refresh 2");
-
-        //     if (!entry)
-        //         return;
-        //     Debug.Log("[TEST] refresh 3");
-
-        //     string key = GetCustomKey(player);
-
-        //     if (!_lobby.lobbyData.TryGetData(key, out string json))
-        //         return;
-        //     Debug.Log("[TEST] refresh 4");
-
-        //     if (string.IsNullOrEmpty(json))
-        //         return;
-        //     Debug.Log("[TEST] refresh 5");
-
-        //     PlayerCustomisation data =
-        //         JsonUtility.FromJson<PlayerCustomisation>(json);
-
-        //     var loader = entry.GetComponent<PlayerCustomisationLoader>();
-
-        //     if (loader != null)
-        //     {
-        //         loader.ApplyCustomisation(data);
-        //     }
-        //     Debug.Log("[TEST] finish refresh");
-        // }
 
         private void RefreshPlayerCustomisation(IPlayer player)
         {
             if (player == null || _lobby == null)
                 return;
 
-            if (!_uiPlayerEntry.TryGetValue(player, out var entry))
-            {
-                Debug.LogWarning($"[CUSTOM] Entry introuvable pour {player.id}");
-                return;
-            }
-
-            if (!entry)
+            if (!_uiPlayerEntry.TryGetValue(player, out var entry) || !entry)
                 return;
 
-            string key = GetCustomKey(player);
-
-            Debug.Log($"[CUSTOM] Recherche de la clé : {key}");
-
-            if (!_lobby.lobbyData.TryGetData(key, out string json))
-            {
-                Debug.LogWarning($"[CUSTOM] Données introuvables pour {player.id}");
+            if (!player.userData.TryGetData(CUSTOM_KEY, out string json) || string.IsNullOrEmpty(json))
                 return;
-            }
-
-            if (string.IsNullOrEmpty(json))
-            {
-                Debug.LogWarning($"[CUSTOM] JSON vide pour {player.id}");
-                return;
-            }
-
-            Debug.Log($"[CUSTOM] Données reçues : {json}");
 
             PlayerCustomisation data =
                 JsonUtility.FromJson<PlayerCustomisation>(json);
@@ -1040,8 +934,6 @@ namespace DwarfSimulator.Lobby
             }
 
             loader.ApplyCustomisation(data);
-
-            Debug.Log($"[CUSTOM] Personnalisation appliquée à {player.id}");
         }
 
         #endregion
