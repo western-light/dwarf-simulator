@@ -36,14 +36,17 @@ namespace DwarfSimulator.Player
             
         }
 
-        void FixedUpdate()
+        void Update()
         {
             if (_parent != null)
             {
                 transform.position = _parent.position;
                 transform.rotation = _parent.rotation;
             }
+        }
 
+        void FixedUpdate()
+        {
             if (_freeze || _interactionFrozen)
             {
                 _anim.SetBool("Walk", false);

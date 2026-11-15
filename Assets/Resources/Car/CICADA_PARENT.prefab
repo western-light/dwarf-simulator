@@ -247,8 +247,8 @@ MonoBehaviour:
   _directChildren: []
   _syncPosition: 2
   _syncRotation: 2
-  _syncScale: 1
-  _syncParent: 1
+  _syncScale: 0
+  _syncParent: 0
   _interpolateSettings: 7
   _minBufferSize: 1
   _maxBufferSize: 2

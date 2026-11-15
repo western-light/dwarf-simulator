@@ -1,7 +1,6 @@
 using DwarfSimulator.Car.Controller;
 using DwarfSimulator.Player;
 using PurrNet;
-using PurrNet.Transports;
 using UnityEngine;
 
 namespace DwarfSimulator.Car
@@ -16,6 +15,7 @@ namespace DwarfSimulator.Car
 
         private CarControllerBase _carController;
         private PlayerCarControl _playerCarControl;
+        private Vector3 _lastInput;
 
         private void Awake()
         {
@@ -92,7 +92,7 @@ namespace DwarfSimulator.Car
             UpdateControlMode();
         }
 
-        // Inputs: seat occupant -> server. Unreliable and sent every tick, so a lost packet is simply replaced.
+        // Inputs: seat occupant -> server. Reliable, and only sent when they change.
         private void OnTick(bool asServer)
         {
             if (asServer || !localPlayer.HasValue)
@@ -103,13 +103,19 @@ namespace DwarfSimulator.Car
             if (!isTop && !isBottom)
                 return;
 
-            SendInputRpc(
+            var input = new Vector3(
                 isTop ? _playerCarControl.ReadSteerInput() : 0f,
                 isBottom ? _playerCarControl.ReadThrottleInput() : 0f,
                 isBottom ? _playerCarControl.ReadBrakeInput() : 0f);
+
+            if (input == _lastInput)
+                return;
+
+            _lastInput = input;
+            SendInputRpc(input.x, input.y, input.z);
         }
 
-        [ServerRpc(Channel.Unreliable, requireOwnership: false)]
+        [ServerRpc(requireOwnership: false)]
         private void SendInputRpc(float steer, float throttle, float brake, RPCInfo info = default)
         {
             if (_topDriver.value == info.sender)
@@ -154,14 +160,13 @@ namespace DwarfSimulator.Car
                 if (player.owner != driver)
                     continue;
 
-                if (isServer)
-                {
-                    player.GetComponent<Collider>().enabled = false;
-                    player.GetComponent<Rigidbody>().isKinematic = true;
-                }
+                // A seated player must not collide with the car it sits in, on any peer.
+                player.GetComponent<Collider>().enabled = false;
+                player.GetComponent<Rigidbody>().isKinematic = true;
 
                 if (player.isOwner)
                 {
+                    _lastInput = Vector3.zero;
                     var movement = player.GetComponent<PlayerMouvement>();
                     movement.Freeze(seat.position, seat.rotation);
                     movement.SyncTransform(seat);
