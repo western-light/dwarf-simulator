@@ -11,73 +11,90 @@ namespace DwarfSimulator.Player
         [SerializeField] private float runSpeed = 5f;
         [SerializeField] private float jumpForce = 5f;
 
-        private InputAction moveAction;
-        private InputAction runAction;
-        private InputAction jumpAction;
-        private Rigidbody rb;
-        private Animator anim;
-        private Collider col;
-        private Transform playerCamera;
+        private InputAction _moveAction;
+        private InputAction _runAction;
+        private InputAction _jumpAction;
+        private Rigidbody _rb;
+        private Animator _anim;
+        private Collider _col;
+        private Transform _playerCamera;
         
-        private Vector3 lastMoveDirection;
-        private bool freeze;
-        private bool interactionFrozen;
+        private Vector3 _lastMoveDirection;
+        private Transform _parent;
+        private bool _freeze;
+        private bool _interactionFrozen;
 
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            col = GetComponent<Collider>();
-            anim = GetComponent<Animator>();
-            playerCamera = Camera.main.transform;
-            moveAction = InputSystem.actions.FindAction("Move");
-            runAction = InputSystem.actions.FindAction("Sprint");
-            jumpAction = InputSystem.actions.FindAction("Jump");
+            _rb = GetComponent<Rigidbody>();
+            _col = GetComponent<Collider>();
+            _anim = GetComponent<Animator>();
+            _playerCamera = Camera.main.transform;
+            _moveAction = InputSystem.actions.FindAction("Move");
+            _runAction = InputSystem.actions.FindAction("Sprint");
+            _jumpAction = InputSystem.actions.FindAction("Jump");
             
         }
 
         void FixedUpdate()
         {
-            if (freeze || interactionFrozen) return;
+            if (_parent != null)
+            {
+                transform.position = _parent.position;
+                transform.rotation = _parent.rotation;
+            }
+
+            if (_freeze || _interactionFrozen)
+            {
+                _anim.SetBool("Walk", false);
+                _anim.SetBool("Run", false);
+                return;
+            }
             
-            Vector2 moveInput = moveAction.ReadValue<Vector2>();
-            Vector3 cameraForward = Vector3.ProjectOnPlane(playerCamera.forward, Vector3.up).normalized;
-            Vector3 cameraRight = Vector3.ProjectOnPlane(playerCamera.right, Vector3.up).normalized;
+            Vector2 moveInput = _moveAction.ReadValue<Vector2>();
+            Vector3 cameraForward = Vector3.ProjectOnPlane(_playerCamera.forward, Vector3.up).normalized;
+            Vector3 cameraRight = Vector3.ProjectOnPlane(_playerCamera.right, Vector3.up).normalized;
             Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
             if (moveDirection.magnitude > 0.1f)
-                lastMoveDirection = moveDirection;
-            bool run = runAction.IsPressed();
+                _lastMoveDirection = moveDirection;
+            bool run = _runAction.IsPressed();
             float speed = run ? runSpeed : moveSpeed;
             
-            anim.SetBool("Walk", moveDirection.magnitude > 0);
-            anim.SetBool("Run", run);
+            _anim.SetBool("Walk", moveDirection.magnitude > 0);
+            _anim.SetBool("Run", run);
             
-            rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
-            Quaternion targetRotation = Quaternion.LookRotation(lastMoveDirection);
-            rb.MoveRotation(targetRotation);
+            _rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
+            Quaternion targetRotation = Quaternion.LookRotation(_lastMoveDirection);
+            _rb.MoveRotation(targetRotation);
             
-            if (jumpAction.IsPressed() && IsGrounded())
+            if (_jumpAction.IsPressed() && IsGrounded())
             {
-                anim.SetTrigger("Jump");
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                _anim.SetTrigger("Jump");
+                _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
         }
 
         private bool IsGrounded()
         {
-            Bounds bounds = col.bounds;
+            Bounds bounds = _col.bounds;
             return Physics.Raycast(bounds.center, Vector3.down, bounds.extents.y + GroundCheckMargin,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         }
         
-        public void Freeze() => freeze = true;
-        public void SetInteractionFrozen(bool value) => interactionFrozen = value;
+        public void Freeze() => _freeze = true;
+        public void SetInteractionFrozen(bool value) => _interactionFrozen = value;
         public void Freeze(Vector3 position, Quaternion rotation)
         {
-            freeze = true;
-            lastMoveDirection = new Vector3(0, 0, 0);
+            _freeze = true;
+            _lastMoveDirection = new Vector3(0, 0, 0);
             transform.position = position;
             transform.rotation = rotation;
         }
-        public void UnFreeze() => freeze = false;
+        public void UnFreeze() => _freeze = false;
+
+        public void SyncTransform(Transform parent)
+        {
+            _parent = parent;
+        }
     }
 }

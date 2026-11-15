@@ -7,12 +7,13 @@ namespace DwarfSimulator.Car.Controller
     [DisallowMultipleComponent]
     public class PlayerCarControl : DriverBase
     {
+        [System.Flags]
         public enum ControlMode
         {
-            None,
-            All,
-            Steering,
-            Speed
+            None = 0,
+            Steering = 1,
+            Speed = 2,
+            All = Steering | Speed
         }
 
         [SerializeField, Min(0.001f)] private float _steerTime = 0.1f;
@@ -38,6 +39,13 @@ namespace DwarfSimulator.Car.Controller
         [SerializeField] private bool _enableVirtualPad = true;
         private ControlMode _controlMode = ControlMode.All;
 
+        // Inputs fed by the network (server side). The local keyboard / virtual pad is only read through
+        // ReadSteerInput / ReadThrottleInput / ReadBrakeInput by the client that occupies a seat.
+        private float _remoteSteer;
+        private float _remoteThrottle;
+        private float _remoteBrake;
+        private bool _useRemoteInput;
+
         public bool SteerLimitByFriction
         {
             get => _steerLimitByFriction;
@@ -56,24 +64,54 @@ namespace DwarfSimulator.Car.Controller
             set => _enableVirtualPad = value;
         }
 
+        /// <summary>
+        /// When enabled, driving inputs come from <see cref="SetRemoteInput"/> instead of the local devices.
+        /// </summary>
+        public bool UseRemoteInput
+        {
+            get => _useRemoteInput;
+            set => _useRemoteInput = value;
+        }
+
         public void SetControlMode(ControlMode controlMode)
         {
             _controlMode = controlMode;
 
-            if (_controlMode != ControlMode.Steering)
-                _carController.SteerInput = 0f;
-            if (_controlMode != ControlMode.Speed)
+            if ((_controlMode & ControlMode.Steering) == 0)
             {
+                _remoteSteer = 0f;
+                _carController.SteerInput = 0f;
+            }
+
+            if ((_controlMode & ControlMode.Speed) == 0)
+            {
+                _remoteThrottle = 0f;
+                _remoteBrake = 0f;
                 _carController.ThrottleInput = 0f;
                 _carController.BrakeInput = 0f;
             }
         }
 
+        public void SetRemoteSteer(float steer)
+        {
+            _remoteSteer = Mathf.Clamp(steer, -1f, 1f);
+        }
+
+        public void SetRemotePedals(float throttle, float brake)
+        {
+            _remoteThrottle = Mathf.Clamp01(throttle);
+            _remoteBrake = Mathf.Clamp01(brake);
+        }
+
+        public float ReadSteerInput() => GetLocalSteerInput();
+        public float ReadThrottleInput() => GetLocalThrottleInput();
+        public float ReadBrakeInput() => GetLocalBrakeInput();
+
         protected override void Drive()
         {
-            if (_controlMode == ControlMode.All || _controlMode == ControlMode.Steering)
+            if ((_controlMode & ControlMode.Steering) != 0)
                 UpdateSteerInput();
-            if (_controlMode == ControlMode.All || _controlMode == ControlMode.Speed)
+            if ((_controlMode & ControlMode.Speed) != 0)
                 UpdateThrottleAndBrakeInput();
         }
 
@@ -95,7 +133,11 @@ namespace DwarfSimulator.Car.Controller
             _carController.ThrottleInput = Mathf.MoveTowards(_carController.ThrottleInput, throttleInput, Time.deltaTime / throttleTime);
         }
 
-        private float GetRawSteerInput()
+        private float GetRawSteerInput() => _useRemoteInput ? _remoteSteer : GetLocalSteerInput();
+        private float GetRawThrottleInput() => _useRemoteInput ? _remoteThrottle : GetLocalThrottleInput();
+        private float GetRawBrakeInput() => _useRemoteInput ? _remoteBrake : GetLocalBrakeInput();
+
+        private float GetLocalSteerInput()
         {
             if (_enableVirtualPad && _leftSteerButton != null && _rightSteerButton != null)
             {
@@ -125,7 +167,7 @@ namespace DwarfSimulator.Car.Controller
             return 0f;
         }
 
-        private float GetRawThrottleInput()
+        private float GetLocalThrottleInput()
         {
             if (_enableVirtualPad && _throttleButton != null)
             {
@@ -144,7 +186,7 @@ namespace DwarfSimulator.Car.Controller
             return 0f;
         }
 
-        private float GetRawBrakeInput()
+        private float GetLocalBrakeInput()
         {
             if (_enableVirtualPad && _brakeButton != null)
             {

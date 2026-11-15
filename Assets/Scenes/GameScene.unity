@@ -731,7 +731,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 40
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -757,8 +757,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.2}
+  m_LocalRotation: {x: -0.04287337, y: 0.7727136, z: -0.05246958, w: -0.631128}
+  m_LocalPosition: {x: 19.417267, y: 2.7041018, z: 3.9569774}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1086,63 +1086,6 @@ MonoBehaviour:
   interactButtonPrefab: {fileID: 6420314528350420660, guid: b9bc37dedb097e81c9aa0ce811a0b880, type: 3}
   interactUI: {fileID: 1858648118}
   interactUITransform: {fileID: 215822619}
---- !u!1 &1033591229
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1033591230}
-  - component: {fileID: 1033591231}
-  m_Layer: 0
-  m_Name: WheelFrontRight
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1033591230
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033591229}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.87, y: 0.278, z: 1.281}
-  m_LocalScale: {x: 1.06, y: 1.06, z: 1.06}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6059919755538778883}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &1033591231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033591229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
-  _hitDetectionType: 0
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 51
-  _queryTriggerInteraction: 1
-  _suspensionStroke: 0.1
-  _suspensionSpring: 40000
-  _suspensionDamper: 2000
-  _radius: 0.25
-  _width: 0.2
-  _camberAngle: 0
-  _groundOffset: 0
-  _model: {fileID: 6059919755538778886}
 --- !u!1 &1058843092
 GameObject:
   m_ObjectHideFlags: 0
@@ -1222,63 +1165,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1099697401
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1099697402}
-  - component: {fileID: 1099697403}
-  m_Layer: 0
-  m_Name: WheelFrontLeft
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1099697402
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1099697401}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.894, y: 0.278, z: 1.281}
-  m_LocalScale: {x: 1.06, y: 1.06, z: 1.06}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6059919755538778883}
-  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
---- !u!114 &1099697403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1099697401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
-  _hitDetectionType: 0
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 51
-  _queryTriggerInteraction: 1
-  _suspensionStroke: 0.1
-  _suspensionSpring: 40000
-  _suspensionDamper: 2000
-  _radius: 0.25
-  _width: 0.2
-  _camberAngle: 0
-  _groundOffset: 0
-  _model: {fileID: 6059919755538778887}
 --- !u!1 &1349514670
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,131 +1353,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1403525330 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7339636131366293908, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6059919755538778881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1732bc9d6525411387edbc8de9ff7d66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.CarPlace
---- !u!1 &1527020839
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1527020840}
-  - component: {fileID: 1527020841}
-  m_Layer: 0
-  m_Name: WheelRearLeft
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1527020840
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1527020839}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: -0.894, y: 0.278, z: -0.844}
-  m_LocalScale: {x: 1.06, y: 1.06, z: 1.06}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6059919755538778883}
-  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
---- !u!114 &1527020841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1527020839}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
-  _hitDetectionType: 0
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 51
-  _queryTriggerInteraction: 1
-  _suspensionStroke: 0.1
-  _suspensionSpring: 40000
-  _suspensionDamper: 2000
-  _radius: 0.25
-  _width: 0.2
-  _camberAngle: 0
-  _groundOffset: 0
-  _model: {fileID: 6059919755538778884}
---- !u!1 &1846011593
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1846011594}
-  - component: {fileID: 1846011595}
-  m_Layer: 0
-  m_Name: WheelRearRight
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1846011594
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1846011593}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.87, y: 0.278, z: -0.842}
-  m_LocalScale: {x: 1.06, y: 1.06, z: 1.06}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 6059919755538778883}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
---- !u!114 &1846011595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1846011593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
-  _hitDetectionType: 0
-  _layerMask:
-    serializedVersion: 2
-    m_Bits: 51
-  _queryTriggerInteraction: 1
-  _suspensionStroke: 0.1
-  _suspensionSpring: 40000
-  _suspensionDamper: 2000
-  _radius: 0.25
-  _width: 0.2
-  _camberAngle: 0
-  _groundOffset: 0
-  _model: {fileID: 6059919755538778885}
 --- !u!1 &1858648118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,7 +1582,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 9.23
+      value: 9.5
       objectReference: {fileID: 0}
     - target: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1855,117 +1616,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1403525330}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: PlaceBottom
-      objectReference: {fileID: 0}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: DwarfSimulator.Car.CarPlace, DwarfSimulator.Car
-      objectReference: {fileID: 0}
-    - target: {fileID: 8578278737818306058, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      propertyPath: choices.Array.data[1].OnInteract.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1099697402}
-    - targetCorrespondingSourceObject: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1033591230}
-    - targetCorrespondingSourceObject: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1846011594}
-    - targetCorrespondingSourceObject: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1527020840}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5844391594909233614, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6059919755538778882}
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
---- !u!1 &6059919755538778881 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5844391594909233614, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6059919755538778882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6059919755538778881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a014c23daebcfd518b6d0f4283d3b4b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.SimpleCarController
-  _steerableWheels: []
-  _maxSteerAngle: 30
-  _maxTurnSpeed: 60
-  _peakFrictionSlipAngle: 5
-  _mu: 2
-  _useAddTorque: 0
-  _wheelRadius: 0.3
-  _centerOfMassHeight: 0.3
-  _maxBrakeTorque: 1000
-  _rollingResistanceCoef: 0.015
-  _airResistanceCoef: 1.5
-  _downforceCoef: 0
-  _airResistanceReduction: 0
-  _autoAdjustSuspension: 1
-  _suspensionStroke: 0.1
-  _suspensionNaturalFrequency: 2
-  _suspensionDampingRatio: 0.35
-  _addForceOffset: -0.1
-  _maxForwardSpeedKPH: 180
-  _maxBackwardSpeedKPH: 60
-  _maxMotorTorque: 300
-  _minMotorFrictionTorque: 15
-  _maxMotorFrictionTorque: 75
-  _motorInertia: 0.1
-  _finalGearRatio: 8
---- !u!4 &6059919755538778883 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5986645776245460276, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6059919755538778884 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1341679232959745489, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6059919755538778885 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1341679232959745479, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6059919755538778886 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1341679232959745481, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6059919755538778887 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1341679232959745491, guid: 026cf9b27054599b587309a79eaeded4, type: 3}
-  m_PrefabInstance: {fileID: 6059919755538778880}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

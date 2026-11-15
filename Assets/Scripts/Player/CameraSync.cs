@@ -9,22 +9,21 @@ namespace DwarfSimulator.Player
     {
         [SerializeField] private Transform cameraPos;
 
-        private CinemachineCamera[] playerCameras;
-        private InputAction toggleViewAction;
-        
+        private CinemachineCamera[] _playerCameras;
+        private InputAction _toggleViewAction;
         
         private void Update()
         {
             if (!isOwner)
                 return;
 
-            if (playerCameras == null)
+            if (_playerCameras == null)
                 Follow();
 
-            if (!toggleViewAction.WasPressedThisFrame())
+            if (!_toggleViewAction.WasPressedThisFrame())
                 return;
 
-            foreach (CinemachineCamera playerCamera in playerCameras)
+            foreach (CinemachineCamera playerCamera in _playerCameras)
             {
                 if (!playerCamera.IsLive)
                 {
@@ -36,23 +35,23 @@ namespace DwarfSimulator.Player
 
         protected override void OnDespawned()
         {
-            if (playerCameras == null)
+            if (_playerCameras == null)
                 return;
 
-            playerCameras = null;
+            _playerCameras = null;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
 
         private void Follow()
         {
-            playerCameras = FindObjectsByType<CinemachineCamera>();
-            foreach (CinemachineCamera playerCamera in playerCameras)
+            _playerCameras = FindObjectsByType<CinemachineCamera>();
+            foreach (CinemachineCamera playerCamera in _playerCameras)
                 playerCamera.Target.TrackingTarget = cameraPos;
 
             FindAnyObjectByType<CinemachinePanTilt>().VirtualCamera.Prioritize();
 
-            toggleViewAction = InputSystem.actions.FindAction("ToggleView");
+            _toggleViewAction = InputSystem.actions.FindAction("ToggleView");
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }

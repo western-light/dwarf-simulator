@@ -25,12 +25,69 @@ Transform:
   m_GameObject: {fileID: 371011736345654232}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.4117, y: 0.1968, z: 0.775}
+  m_LocalPosition: {x: -0.861, y: 0.34, z: 1.652}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7873216080507721997}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2440798171087878032
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3753761250240536702}
+  - component: {fileID: 6817229945000110064}
+  m_Layer: 0
+  m_Name: WheelFrontRight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3753761250240536702
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2440798171087878032}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 1.843, y: 0.49, z: 2.774}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5986645776245460276}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!114 &6817229945000110064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2440798171087878032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
+  _hitDetectionType: 0
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 51
+  _queryTriggerInteraction: 1
+  _suspensionStroke: 0.1
+  _suspensionSpring: 40000
+  _suspensionDamper: 2000
+  _radius: 0.65
+  _width: 0.2
+  _camberAngle: 0
+  _groundOffset: 0
+  _model: {fileID: 1341679232959745481}
 --- !u!1 &4348748386223419822
 GameObject:
   m_ObjectHideFlags: 0
@@ -64,6 +121,63 @@ Transform:
   - {fileID: 4873162507080220747}
   m_Father: {fileID: 5986645776245460276}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5220508023248813458
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4944356014223358124}
+  - component: {fileID: 7005119373905686957}
+  m_Layer: 0
+  m_Name: WheelRearLeft
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4944356014223358124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5220508023248813458}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: -1.841, y: 0.49, z: -1.84}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5986645776245460276}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!114 &7005119373905686957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5220508023248813458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
+  _hitDetectionType: 0
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 51
+  _queryTriggerInteraction: 1
+  _suspensionStroke: 0.1
+  _suspensionSpring: 40000
+  _suspensionDamper: 2000
+  _radius: 0.65
+  _width: 0.2
+  _camberAngle: 0
+  _groundOffset: 0
+  _model: {fileID: 1341679232959745489}
 --- !u!1 &5844391594909233614
 GameObject:
   m_ObjectHideFlags: 0
@@ -78,6 +192,7 @@ GameObject:
   - component: {fileID: 3343812340950452435}
   - component: {fileID: 8578278737818306058}
   - component: {fileID: 7339636131366293908}
+  - component: {fileID: 5346971055408869384}
   m_Layer: 0
   m_Name: CICADA_PARENT
   m_TagString: Untagged
@@ -93,16 +208,20 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5844391594909233614}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.000000026692542, y: 0.7071067, z: 0.000000026692536, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 369.14, y: 9.23, z: 439.67}
-  m_LocalScale: {x: 2.0717762, y: 2.0717762, z: 2.0717762}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1341679232959745503}
   - {fileID: 2840798765872139219}
   - {fileID: 7873216080507721997}
+  - {fileID: 2954374703300135355}
+  - {fileID: 3753761250240536702}
+  - {fileID: 4722181636480494667}
+  - {fileID: 4944356014223358124}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!114 &7150715453270439417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,7 +264,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5844391594909233614}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 1000
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -163,7 +282,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
 --- !u!64 &3343812340950452435
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -238,10 +357,10 @@ MonoBehaviour:
         - m_Target: {fileID: 7339636131366293908}
           m_TargetAssemblyTypeName: DwarfSimulator.Car.CarPlace, DwarfSimulator.Car
           m_MethodName: PlaceBottom
-          m_Mode: 2
+          m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: DwarfSimulator.Player.Player, DwarfSimulator.Player
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
@@ -267,8 +386,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1732bc9d6525411387edbc8de9ff7d66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.CarPlace
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
   top: {fileID: 5335988764720186367}
   bottom: {fileID: 4873162507080220747}
+--- !u!114 &5346971055408869384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5844391594909233614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a014c23daebcfd518b6d0f4283d3b4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.SimpleCarController
+  _steerableWheels:
+  - {fileID: 2969472829911131913}
+  - {fileID: 6817229945000110064}
+  _maxSteerAngle: 30
+  _maxTurnSpeed: 60
+  _peakFrictionSlipAngle: 5
+  _mu: 2
+  _useAddTorque: 0
+  _wheelRadius: 0.3
+  _centerOfMassHeight: 0.3
+  _maxBrakeTorque: 1000
+  _rollingResistanceCoef: 0.015
+  _airResistanceCoef: 1.5
+  _downforceCoef: 0
+  _airResistanceReduction: 0
+  _autoAdjustSuspension: 1
+  _suspensionStroke: 0.1
+  _suspensionNaturalFrequency: 2
+  _suspensionDampingRatio: 0.35
+  _addForceOffset: -0.05
+  _maxForwardSpeedKPH: 180
+  _maxBackwardSpeedKPH: 60
+  _maxMotorTorque: 300
+  _minMotorFrictionTorque: 15
+  _maxMotorFrictionTorque: 75
+  _motorInertia: 0.1
+  _finalGearRatio: 8
 --- !u!1 &6123201638619093826
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,12 +463,126 @@ Transform:
   m_GameObject: {fileID: 6123201638619093826}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.419, y: 0.524, z: 0.291}
+  m_LocalPosition: {x: -0.797, y: 0.996, z: 0.645}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7873216080507721997}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7349683466919919440
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2954374703300135355}
+  - component: {fileID: 6695601221423005988}
+  m_Layer: 0
+  m_Name: WheelFrontLeft
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2954374703300135355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7349683466919919440}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: -1.8, y: 0.49, z: 2.82}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5986645776245460276}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!114 &6695601221423005988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7349683466919919440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
+  _hitDetectionType: 0
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 51
+  _queryTriggerInteraction: 1
+  _suspensionStroke: 0.1
+  _suspensionSpring: 40000
+  _suspensionDamper: 2000
+  _radius: 0.65
+  _width: 0.2
+  _camberAngle: 0
+  _groundOffset: 0
+  _model: {fileID: 1341679232959745491}
+--- !u!1 &8340870184793592427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4722181636480494667}
+  - component: {fileID: 2969472829911131913}
+  m_Layer: 0
+  m_Name: WheelRearRight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4722181636480494667
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340870184793592427}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
+  m_LocalPosition: {x: 1.79, y: 0.49, z: -1.86}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 5986645776245460276}
+  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!114 &2969472829911131913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8340870184793592427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc0e0d08546657f9f86493ac0cb267e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Car::DwarfSimulator.Car.Controller.Wheel
+  _hitDetectionType: 0
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 51
+  _queryTriggerInteraction: 1
+  _suspensionStroke: 0.1
+  _suspensionSpring: 40000
+  _suspensionDamper: 2000
+  _radius: 0.65
+  _width: 0.2
+  _camberAngle: 0
+  _groundOffset: 0
+  _model: {fileID: 1341679232959745479}
 --- !u!1001 &1341679232959616863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -338,11 +621,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.025399992
+      value: 0.055000003
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.055000003
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.025399992
+      value: 0.055000003
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -383,6 +670,10 @@ PrefabInstance:
     - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 65a090704015245488740a1e2357c69c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -453,6 +744,26 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65a090704015245488740a1e2357c69c, type: 3}
+--- !u!4 &1341679232959745479 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400024, guid: 65a090704015245488740a1e2357c69c, type: 3}
+  m_PrefabInstance: {fileID: 1341679232959616863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1341679232959745481 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400022, guid: 65a090704015245488740a1e2357c69c, type: 3}
+  m_PrefabInstance: {fileID: 1341679232959616863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1341679232959745489 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400014, guid: 65a090704015245488740a1e2357c69c, type: 3}
+  m_PrefabInstance: {fileID: 1341679232959616863}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1341679232959745491 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400012, guid: 65a090704015245488740a1e2357c69c, type: 3}
+  m_PrefabInstance: {fileID: 1341679232959616863}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1341679232959745503 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 65a090704015245488740a1e2357c69c, type: 3}
