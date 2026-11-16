@@ -3157,7 +3157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dee0d9b574c5c0deb9d4a0225d092ba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Lobby::DwarfSimulator.Lobby.LobbyView
-  _minPlayerCount: 2
+  _minPlayerCount: 1
   _rocks:
   - {fileID: 295961277}
   - {fileID: 2122219860}
@@ -7976,35 +7976,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 48.41
       objectReference: {fileID: 0}
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 12.85
       objectReference: {fileID: 0}
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 29.205
       objectReference: {fileID: 0}
     - target: {fileID: 878941584640791983, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -11.425
       objectReference: {fileID: 0}
     - target: {fileID: 2868528287277805578, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 58.41
       objectReference: {fileID: 0}
     - target: {fileID: 2868528287277805578, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 22.85
       objectReference: {fileID: 0}
     - target: {fileID: 6176887594042252844, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_Name
@@ -8012,7 +8012,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6176887594042252844, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6841924575905154198, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
       propertyPath: m_LocalPosition.x
