@@ -1202,7 +1202,7 @@ MonoBehaviour:
   _cookieScope: 1
   _dontDestroyOnLoad: 0
   _transport: {fileID: 1349514674}
-  _networkPrefabs: {fileID: 11400000, guid: 5ff5ecb19b765206fb44cf0b9fe89f33, type: 2}
+  _networkPrefabs: {fileID: 11400000, guid: daad513eb598178c3988db59b1616ed5, type: 2}
   _networkAssets: {fileID: 11400000, guid: 790134041bfd02d1b8312a3e7df2688e, type: 2}
   _networkRules: {fileID: 11400000, guid: d8799083b96579a42b8b2d03e4ceae98, type: 2}
   _visibilityRules: {fileID: 11400000, guid: 8f014a5bd8dc68646a2a3c0b18c5bbd8, type: 2}
