@@ -4,11 +4,14 @@ using UnityEngine;
 namespace DwarfSimulator.Player
 {
     [RequireComponent(typeof(NetworkTransform), typeof(Rigidbody), typeof(Collider))]
+    [RequireComponent(typeof(PlayerCustomisationLoader))]
     public class Player : PlayerIdentity<Player>
     {
         private Collider _collider;
         private Rigidbody _rigidbody;
         private NetworkTransform _networkTransform;
+        private PlayerCustomisationLoader _customisationLoader;
+        private readonly SyncVar<PlayerCustomisation> _customisation = new(ownerAuth: true);
 
         public Transform Seat { get; private set; }
         public bool IsSeated => Seat != null;
@@ -18,6 +21,29 @@ namespace DwarfSimulator.Player
             _collider = GetComponent<Collider>();
             _rigidbody = GetComponent<Rigidbody>();
             _networkTransform = GetComponent<NetworkTransform>();
+            _customisationLoader = GetComponent<PlayerCustomisationLoader>();
+        }
+
+        protected override void OnSpawned()
+        {
+            base.OnSpawned();
+
+            if (isOwner)
+                _customisation.value = PlayerCustomisationLoader.LoadLocal();
+
+            _customisation.onChanged += ApplyCustomisation;
+            ApplyCustomisation(_customisation.value);
+        }
+
+        protected override void OnDespawned()
+        {
+            _customisation.onChanged -= ApplyCustomisation;
+            base.OnDespawned();
+        }
+
+        private void ApplyCustomisation(PlayerCustomisation data)
+        {
+            _customisationLoader.ApplyCustomisation(data);
         }
 
         public void SitIn(Transform seat)
