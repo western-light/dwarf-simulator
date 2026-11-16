@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 1bc1c5b93f8567f4d9ddfe5e1d816496
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318780
+  packageName: Ushi Arcade Car Physics Free
+  packageVersion: 1.0.0
+  assetPath: Assets/UshiSoft/ArcadeCarPhysicsFree/Prefabs/BrakeButton.prefab
+  uploadId: 753396

@@ -11,54 +11,75 @@ namespace DwarfSimulator.Player
         [SerializeField] private float runSpeed = 5f;
         [SerializeField] private float jumpForce = 5f;
 
-        private InputAction moveAction;
-        private InputAction runAction;
-        private InputAction jumpAction;
-        private Rigidbody rb;
-        private Animator anim;
-        private Collider col;
+        private InputAction _moveAction;
+        private InputAction _runAction;
+        private InputAction _jumpAction;
+        private Player _player;
+        private Rigidbody _rb;
+        private Animator _anim;
+        private Collider _col;
+        private Transform _playerCamera;
         
-        private Vector3 lastMoveDirection;
+        private Vector3 _lastMoveDirection;
+        private bool _interactionFrozen;
+
+        void Awake()
+        {
+            _player = GetComponent<Player>();
+            _rb = GetComponent<Rigidbody>();
+            _col = GetComponent<Collider>();
+            _anim = GetComponent<Animator>();
+        }
 
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            col = GetComponent<Collider>();
-            anim = GetComponent<Animator>();
-            moveAction = InputSystem.actions.FindAction("Move");
-            runAction = InputSystem.actions.FindAction("Sprint");
-            jumpAction = InputSystem.actions.FindAction("Jump");
+            _playerCamera = Camera.main.transform;
+            _moveAction = InputSystem.actions.FindAction("Move");
+            _runAction = InputSystem.actions.FindAction("Sprint");
+            _jumpAction = InputSystem.actions.FindAction("Jump");
             
         }
 
         void FixedUpdate()
         {
-            Vector2 moveInput = moveAction.ReadValue<Vector2>();
-            Vector3 moveDirection = new Vector3(moveInput.x, 0, moveInput.y).normalized;
+            if (_player.IsSeated || _interactionFrozen)
+            {
+                _anim.SetBool("Walk", false);
+                _anim.SetBool("Run", false);
+                _lastMoveDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+                return;
+            }
+            
+            Vector2 moveInput = _moveAction.ReadValue<Vector2>();
+            Vector3 cameraForward = Vector3.ProjectOnPlane(_playerCamera.forward, Vector3.up).normalized;
+            Vector3 cameraRight = Vector3.ProjectOnPlane(_playerCamera.right, Vector3.up).normalized;
+            Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
             if (moveDirection.magnitude > 0.1f)
-                lastMoveDirection = moveDirection;
-            bool run = runAction.IsPressed();
+                _lastMoveDirection = moveDirection;
+            bool run = _runAction.IsPressed();
             float speed = run ? runSpeed : moveSpeed;
             
-            anim.SetBool("Walk", moveDirection.magnitude > 0);
-            anim.SetBool("Run", run);
+            _anim.SetBool("Walk", moveDirection.magnitude > 0);
+            _anim.SetBool("Run", run);
             
-            rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
-            Quaternion targetRotation = Quaternion.LookRotation(lastMoveDirection);
-            rb.MoveRotation(targetRotation);
+            _rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
+            if (_lastMoveDirection.sqrMagnitude > 0.01f)
+                _rb.MoveRotation(Quaternion.LookRotation(_lastMoveDirection));
             
-            if (jumpAction.IsPressed() && IsGrounded())
+            if (_jumpAction.IsPressed() && IsGrounded())
             {
-                anim.SetTrigger("Jump");
-                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+                _anim.SetTrigger("Jump");
+                _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
         }
 
         private bool IsGrounded()
         {
-            Bounds bounds = col.bounds;
+            Bounds bounds = _col.bounds;
             return Physics.Raycast(bounds.center, Vector3.down, bounds.extents.y + GroundCheckMargin,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
         }
+        
+        public void SetInteractionFrozen(bool value) => _interactionFrozen = value;
     }
 }

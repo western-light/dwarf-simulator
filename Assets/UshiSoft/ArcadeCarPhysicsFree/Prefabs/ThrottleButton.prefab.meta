@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0cb9f74bfb4af0043adf681a210dbb35
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 318780
+  packageName: Ushi Arcade Car Physics Free
+  packageVersion: 1.0.0
+  assetPath: Assets/UshiSoft/ArcadeCarPhysicsFree/Prefabs/ThrottleButton.prefab
+  uploadId: 753396
