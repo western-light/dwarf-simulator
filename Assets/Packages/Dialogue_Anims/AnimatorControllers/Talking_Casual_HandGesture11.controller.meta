@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ac40aae4ecc7e054fb8c304c4da14eed
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_Casual_HandGesture11.controller
+  uploadId: 499920

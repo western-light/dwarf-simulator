@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 231a744762e07644295378bd783c1412
+timeCreated: 1531907467
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121798
+  packageName: Ground Fitter
+  packageVersion: 1.2.2.1
+  assetPath: Assets/FImpossible Creations/Plugins - Shared/FBasic Assets/Models/Feetle/Materials/Mat.1.mat
+  uploadId: 1026422

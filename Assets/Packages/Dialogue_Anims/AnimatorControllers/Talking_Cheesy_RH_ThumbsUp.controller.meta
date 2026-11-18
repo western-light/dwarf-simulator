@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6d48d766bc2c60240925ca5fe0dbcb37
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_Cheesy_RH_ThumbsUp.controller
+  uploadId: 499920

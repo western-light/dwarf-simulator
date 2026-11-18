@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f7c3c205bcd86f0409055bb82f7267fe
+timeCreated: 1547552086
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121798
+  packageName: Ground Fitter
+  packageVersion: 1.2.2.1
+  assetPath: Assets/FImpossible Creations/Plugins - Shared/FBasic Assets/Models/Fhreeped/AC_Fhreeped.controller
+  uploadId: 1026422

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: cc44f8663b1fc8f439493267bf8260d6
+timeCreated: 1528903411
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121798
+  packageName: Ground Fitter
+  packageVersion: 1.2.2.1
+  assetPath: Assets/FImpossible Creations/Plugins - Shared/FBasic Assets/Shared Materials/MAT_Shared_Wall.mat
+  uploadId: 1026422

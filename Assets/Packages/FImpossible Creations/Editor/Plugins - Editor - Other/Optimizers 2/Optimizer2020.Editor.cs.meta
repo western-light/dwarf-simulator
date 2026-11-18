@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: cc0261a55b0773543b3d29401d4bf356
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Editor/Plugins - Editor - Other/Optimizers 2/Optimizer2020.Editor.cs
+  uploadId: 1026382

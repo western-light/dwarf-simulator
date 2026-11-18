@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 02341f4734a372149983c21553df570f
+timeCreated: 1528574197
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121798
+  packageName: Ground Fitter
+  packageVersion: 1.2.2.1
+  assetPath: Assets/FImpossible Creations/Plugins - Shared/FBasic Assets/Models/Props/FLogo/MAT_Flogo_Main Blue.mat
+  uploadId: 1026422

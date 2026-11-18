@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 516eced26f003be418a4132deebb3c62
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: a5ddc4c0cb6b2c44998716d1a630b902, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Plugins - Other/Optimizers 2/Code/Optimize Types/Scriptable LOD Types/ScrLOD_MonoBehaviour.cs
+  uploadId: 1026382

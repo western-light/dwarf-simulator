@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 6320a7b36b6651a4eb988872e426a0e9
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122249
+  packageName: Look Animator
+  packageVersion: 2.0.2.5
+  assetPath: Assets/FImpossible Creations/Editor/Plugins - Editor - Animating/Look Animator/Resources/Look Animator/LookAnimator_Langs.xml
+  uploadId: 1026520

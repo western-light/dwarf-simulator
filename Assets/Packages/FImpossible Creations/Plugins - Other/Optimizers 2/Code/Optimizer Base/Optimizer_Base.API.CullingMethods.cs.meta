@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ca88170a7b19a3447a2ab8fd6af740d6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Plugins - Other/Optimizers 2/Code/Optimizer Base/Optimizer_Base.API.CullingMethods.cs
+  uploadId: 1026382

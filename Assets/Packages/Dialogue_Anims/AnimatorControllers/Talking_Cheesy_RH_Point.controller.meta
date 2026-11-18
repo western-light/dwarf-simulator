@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 67366ff71817d484fa1b35157982c63b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_Cheesy_RH_Point.controller
+  uploadId: 499920

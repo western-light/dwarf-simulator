@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 2198463e97efa3e4b98274048e455c07
+timeCreated: 1531497260
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122249
+  packageName: Look Animator
+  packageVersion: 2.0.2.5
+  assetPath: Assets/FImpossible Creations/Editor/Plugins - Editor - Animating/Look Animator/LookAnimator.Editor.Elements.cs
+  uploadId: 1026520

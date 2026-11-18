@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 33de416ad5fe88f4eb2e1bb6763af637
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Plugins - Other/Optimizers 2/Code/Optimizer Base/Optimizer_Base.Extension.DOTS.cs
+  uploadId: 1026382

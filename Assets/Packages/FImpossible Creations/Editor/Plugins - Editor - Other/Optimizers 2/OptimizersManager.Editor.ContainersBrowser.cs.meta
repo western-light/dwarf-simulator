@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 098b664d4454ee44e8247c7ecf48d638
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Editor/Plugins - Editor - Other/Optimizers 2/OptimizersManager.Editor.ContainersBrowser.cs
+  uploadId: 1026382

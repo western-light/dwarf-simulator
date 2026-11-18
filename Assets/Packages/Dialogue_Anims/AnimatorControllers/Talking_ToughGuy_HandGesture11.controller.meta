@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8f3546b837c7c39439f6248964fb3f2a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_ToughGuy_HandGesture11.controller
+  uploadId: 499920

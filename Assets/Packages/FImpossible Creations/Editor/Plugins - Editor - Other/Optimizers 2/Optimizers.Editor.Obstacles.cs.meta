@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2fcad0c59757b824b96e304a31c4bc23
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Editor/Plugins - Editor - Other/Optimizers 2/Optimizers.Editor.Obstacles.cs
+  uploadId: 1026382

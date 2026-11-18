@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 171797ccc1bc4e449a350163e03b2785
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Plugins - Other/Optimizers 2/Code/Helpers/Optimizers_Enums.cs
+  uploadId: 1026382

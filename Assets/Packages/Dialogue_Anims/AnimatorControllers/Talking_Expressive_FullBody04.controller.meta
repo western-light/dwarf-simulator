@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d9b4b2395f1d2ff4fa7cd11d3b136bda
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_Expressive_FullBody04.controller
+  uploadId: 499920

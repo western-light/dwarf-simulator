@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 96ea0e8659e2337469528d5956e40ff7
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_Goblin_02.controller
+  uploadId: 499920

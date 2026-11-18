@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 12edec8a3fa410c43bd856cfe8d98418
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 222285
+  packageName: Dialogue Anims
+  packageVersion: 1.0
+  assetPath: Assets/Dialogue_Anims/AnimatorControllers/Talking_HandOnHip_Enter.controller
+  uploadId: 499920

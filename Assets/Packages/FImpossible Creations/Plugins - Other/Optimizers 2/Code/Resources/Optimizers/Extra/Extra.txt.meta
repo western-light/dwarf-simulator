@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c6c07da7750d8054bae8f8170c18df02
+timeCreated: 1600804197
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 122247
+  packageName: Optimizers
+  packageVersion: 2.2.3.2
+  assetPath: Assets/FImpossible Creations/Plugins - Other/Optimizers 2/Code/Resources/Optimizers/Extra/Extra.txt
+  uploadId: 1026382
