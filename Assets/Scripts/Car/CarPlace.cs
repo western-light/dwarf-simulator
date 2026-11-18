@@ -90,11 +90,24 @@ namespace DwarfSimulator.Car
         private void OnSeatChanged(Player.Player oldPlayer, Player.Player newPlayer, Transform seat)
         {
             if (oldPlayer != null && oldPlayer.Seat == seat)
+            {
                 oldPlayer.GetOut(transform.position - transform.right * exitDistance + Vector3.up * 0.5f,
                     Quaternion.Euler(0f, transform.eulerAngles.y, 0f));
+                if (oldPlayer.isOwner && oldPlayer.TryGetComponent(out Player.CameraSync oldCamera))
+                    oldCamera.UnlockView();
+            }
 
             if (newPlayer != null)
+            {
                 newPlayer.SitIn(seat);
+                if (newPlayer.isOwner && newPlayer.TryGetComponent(out Player.CameraSync newCamera))
+                {
+                    if (seat == bottom)
+                        newCamera.LockFirstPersonStabilized(seat);
+                    else
+                        newCamera.LockThirdPerson();
+                }
+            }
 
             _lastInput = default;
             if (isServer)
