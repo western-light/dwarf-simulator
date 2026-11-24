@@ -43,6 +43,9 @@ namespace DwarfSimulator.LowPolyWorld
         [Header("Repartition des couleurs")]
         [Range(0f, 1f)] public float rockHeight = 0.50f;
         [Range(0f, 1f)] public float snowHeight = 0.72f;
+        [Tooltip("Altitude normalisée sous laquelle le terrain prend la couleur du sable. -1 désactive le sable.")]
+        [Range(-1f, 1f)] public float sandHeight = -1f;
+        public Color shoreSand = new Color(0.80f, 0.68f, 0.46f, 1f);
         [Range(0f, 90f)] public float rockSlope = 38f;
         [Range(0f, 0.25f)] public float colorVariation = 0.07f;
         public LowPolyPalette palette = new LowPolyPalette();

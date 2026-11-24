@@ -31,7 +31,7 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             public Color rightGroundTint;
         }
 
-        internal static void BuildTerrain(LowPolyTerrainMesh target)
+        internal static void BuildTerrain(LowPolyTerrainMesh target, Material material = null, string meshPath = null)
         {
             if (target == null || target.sourceTerrain == null || target.sourceTerrain.terrainData == null)
             {
@@ -74,9 +74,9 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             ApplyPaintStrokes(target, vertices, colors, triangles);
 
             Mesh mesh = CreateMesh("LP_Terrain_" + target.sourceTerrain.name, vertices, normals, colors, triangles, uvs);
-            Mesh savedMesh = SaveMesh(mesh, target.gameObject.name + "_Terrain", ref target.generatedMeshGuid);
+            Mesh savedMesh = SaveMesh(mesh, target.gameObject.name + "_Terrain", ref target.generatedMeshGuid, assetPath: meshPath);
             AssignMesh(target.meshFilter, target.meshCollider, savedMesh, target.useGeneratedMeshCollider);
-            target.meshRenderer.sharedMaterial = EnsureMaterial();
+            target.meshRenderer.sharedMaterial = material != null ? material : CompatibleMaterial(target.meshRenderer);
             target.meshRenderer.receiveShadows = false;
             target.sourceTerrain.drawHeightmap = !target.hideSourceRendering;
             EditorUtility.SetDirty(target.sourceTerrain);
@@ -94,14 +94,14 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             if (!TryCreateRoadMesh(road, ResolveRoadSplines(road), out Mesh mesh, out message))
                 return false;
 
-            Material material = EnsureMaterial();
+            road.CacheComponents();
+            Material material = CompatibleMaterial(road.meshRenderer);
             if (material == null)
             {
                 UnityEngine.Object.DestroyImmediate(mesh);
                 message = "Le matériau Low Poly World est indisponible. Vérifie la compilation du shader URP.";
                 return false;
             }
-            road.CacheComponents();
             Undo.RecordObjects(new UnityEngine.Object[] { road, road.meshFilter, road.meshCollider, road.meshRenderer },
                 "Régénérer la route");
             if (!string.IsNullOrEmpty(road.generatedMeshGuid))
@@ -334,6 +334,12 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             return container.Splines;
         }
 
+        private static Material CompatibleMaterial(MeshRenderer renderer)
+        {
+            Material current = renderer.sharedMaterial;
+            return current != null && current.shader != null && current.shader.name == ShaderName ? current : EnsureMaterial();
+        }
+
         internal static Material EnsureMaterial()
         {
             EnsureGeneratedFolder();
@@ -417,7 +423,11 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             Color baseColor;
             float tone = Mathf.Clamp01(normalizedHeight * 0.65f + 0.25f);
 
-            if (normalizedHeight >= settings.snowHeight)
+            if (normalizedHeight <= settings.sandHeight)
+            {
+                baseColor = settings.shoreSand;
+            }
+            else if (normalizedHeight >= settings.snowHeight)
             {
                 baseColor = Color.Lerp(settings.palette.snowShadow, settings.palette.snowLight, tone);
             }
@@ -1273,12 +1283,14 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             return mesh;
         }
 
-        private static Mesh SaveMesh(Mesh generated, string baseName, ref string guid, bool recordUndo = false)
+        private static Mesh SaveMesh(Mesh generated, string baseName, ref string guid, bool recordUndo = false,
+            string assetPath = null)
         {
             EnsureGeneratedFolder();
             string existingPath = string.IsNullOrEmpty(guid) ? string.Empty : AssetDatabase.GUIDToAssetPath(guid);
             Mesh existing = !string.IsNullOrEmpty(existingPath) &&
-                existingPath.StartsWith(GeneratedRoot + "/", StringComparison.Ordinal)
+                (existingPath.StartsWith(GeneratedRoot + "/", StringComparison.Ordinal) ||
+                 existingPath.StartsWith("Assets/LowPolyWorld/SeptSecteurs/Donnees/", StringComparison.Ordinal))
                 ? AssetDatabase.LoadAssetAtPath<Mesh>(existingPath) : null;
             if (existing != null)
             {
@@ -1291,7 +1303,7 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             }
 
             string safeName = MakeSafeName(baseName);
-            string path = AssetDatabase.GenerateUniqueAssetPath(GeneratedRoot + "/" + safeName + ".asset");
+            string path = AssetDatabase.GenerateUniqueAssetPath(assetPath ?? GeneratedRoot + "/" + safeName + ".asset");
             AssetDatabase.CreateAsset(generated, path);
             guid = AssetDatabase.AssetPathToGUID(path);
             return generated;
