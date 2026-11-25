@@ -1,21 +1,54 @@
 using DwarfSimulator.Car.Controller;
+using DwarfSimulator.Player.Interactor;
 using PurrNet;
+using PurrNet.Packing;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace DwarfSimulator.Car
 {
     [RequireComponent(typeof(CarControllerBase))]
-    public class CarPlace : NetworkBehaviour
+    public class CarPlace : NetworkBehaviour, IInteractionAvailability, IInteractionLabel
     {
+        public struct SeatAssignments : IPackedAuto
+        {
+            public PlayerID? Top;
+            public PlayerID? Bottom;
+
+            public bool TryAssign(PlayerID player, bool onTop, out SeatAssignments result)
+            {
+                result = this;
+                PlayerID? destination = onTop ? Top : Bottom;
+                PlayerID? source = onTop ? Bottom : Top;
+                if (destination == player || (destination.HasValue && source != player))
+                    return false;
+
+                if (onTop)
+                {
+                    result.Top = player;
+                    if (source == player)
+                        result.Bottom = destination;
+                }
+                else
+                {
+                    result.Bottom = player;
+                    if (source == player)
+                        result.Top = destination;
+                }
+                return true;
+            }
+        }
+
         [SerializeField] private Transform top;
         [SerializeField] private Transform bottom;
         [SerializeField] private float exitDistance = 2.2f;
 
-        private SyncLazyRef<Player.Player> _topSeat = new();
-        private SyncLazyRef<Player.Player> _bottomSeat = new();
+        private readonly SyncVar<SeatAssignments> _seats = new();
         private SyncVar<float> _steer = new();
 
+        private Player.Player _topPlayer;
+        private Player.Player _bottomPlayer;
+        private bool _inputNeedsSending = true;
         private CarControllerBase _car;
         private PlayerCarControl _driver;
         private InputAction _leaveAction;
@@ -36,10 +69,18 @@ namespace DwarfSimulator.Car
             _driver.enabled = isServer;
             _leaveAction = InputSystem.actions.FindAction("Jump");
 
-            _topSeat.onChanged += (oldPlayer, newPlayer) => OnSeatChanged(oldPlayer, newPlayer, top);
-            _bottomSeat.onChanged += (oldPlayer, newPlayer) => OnSeatChanged(oldPlayer, newPlayer, bottom);
-            OnSeatChanged(null, _topSeat.value, top);
-            OnSeatChanged(null, _bottomSeat.value, bottom);
+            _seats.onChanged += OnAssignmentsChanged;
+            OnAssignmentsChanged(_seats.value);
+        }
+
+        protected override void OnDespawned()
+        {
+            _seats.onChanged -= OnAssignmentsChanged;
+            OnSeatChanged(_topPlayer, null, top);
+            OnSeatChanged(_bottomPlayer, null, bottom);
+            _topPlayer = null;
+            _bottomPlayer = null;
+            base.OnDespawned();
         }
 
         private void Update()
@@ -47,13 +88,17 @@ namespace DwarfSimulator.Car
             if (!isSpawned)
                 return;
 
+            ReconcileSeats();
             if (isServer)
+            {
+                RemoveDisconnectedPlayers();
                 _steer.value = _car.SteerInput;
+            }
             else
                 TurnWheels();
 
-            bool onTop = IsLocal(_topSeat);
-            bool onBottom = IsLocal(_bottomSeat);
+            bool onTop = _topPlayer != null && _topPlayer.isOwner;
+            bool onBottom = _bottomPlayer != null && _bottomPlayer.isOwner;
             if (!onTop && !onBottom)
                 return;
 
@@ -63,15 +108,19 @@ namespace DwarfSimulator.Car
                 return;
             }
 
+            Player.Player localPlayer = onTop ? _topPlayer : _bottomPlayer;
+            bool menuOpen = localPlayer.TryGetComponent(out Player.PlayerInteract interaction) &&
+                            interaction.IsInteractionOpen;
             (float steer, float throttle, float brake) input = (
-                onTop ? _driver.ReadSteerInput() : 0f,
-                onBottom ? _driver.ReadThrottleInput() : 0f,
-                onBottom ? _driver.ReadBrakeInput() : 0f);
+                onTop && !menuOpen ? _driver.ReadSteerInput() : 0f,
+                onBottom && !menuOpen ? _driver.ReadThrottleInput() : 0f,
+                onBottom && !menuOpen ? _driver.ReadBrakeInput() : 0f);
 
-            if (input == _lastInput)
+            if (!_inputNeedsSending && input == _lastInput)
                 return;
 
             _lastInput = input;
+            _inputNeedsSending = false;
             SendInputRpc(input.steer, input.throttle, input.brake);
         }
 
@@ -87,6 +136,92 @@ namespace DwarfSimulator.Car
                 RequestSeatRpc(false);
         }
 
+        public string UnavailableReason(int choiceIndex, Player.Player player)
+        {
+            if (!isSpawned)
+                return "interaction indisponible";
+            if (choiceIndex < 0 || choiceIndex > 1)
+                return "interaction indisponible";
+            PlayerID? owner = player != null ? player.owner : null;
+            SeatAssignments seats = _seats.value;
+            PlayerID? seat = choiceIndex == 0 ? seats.Top : seats.Bottom;
+            PlayerID? otherSeat = choiceIndex == 0 ? seats.Bottom : seats.Top;
+            if (owner.HasValue && seat == owner)
+                return "place actuelle";
+            return seat.HasValue && (!owner.HasValue || otherSeat != owner) ? "place occupee" : null;
+        }
+
+        public string ChoiceName(int choiceIndex, Player.Player player, string defaultName)
+        {
+            if (choiceIndex < 0 || choiceIndex > 1 || player == null || !player.owner.HasValue)
+                return defaultName;
+            SeatAssignments seats = _seats.value;
+            PlayerID? destination = choiceIndex == 0 ? seats.Top : seats.Bottom;
+            PlayerID? source = choiceIndex == 0 ? seats.Bottom : seats.Top;
+            return destination.HasValue && source == player.owner
+                ? $"{defaultName} (echanger)" : defaultName;
+        }
+
+        private void OnAssignmentsChanged(SeatAssignments seats)
+        {
+            if (isServer)
+            {
+                _driver.SetRemoteSteer(0f);
+                _driver.SetRemotePedals(0f, 0f);
+                RefreshControlMode();
+            }
+            _inputNeedsSending = true;
+            ReconcileSeats();
+        }
+
+        private void ReconcileSeats()
+        {
+            SeatAssignments seats = _seats.value;
+            Player.Player newTop = ResolvePlayer(seats.Top);
+            Player.Player newBottom = ResolvePlayer(seats.Bottom);
+            if (newTop == _topPlayer && newBottom == _bottomPlayer)
+                return;
+
+            Player.Player oldTop = _topPlayer;
+            Player.Player oldBottom = _bottomPlayer;
+            _topPlayer = newTop;
+            _bottomPlayer = newBottom;
+
+            if (oldTop != null && oldTop != newTop && oldTop != newBottom)
+                OnSeatChanged(oldTop, null, top);
+            if (oldBottom != null && oldBottom != newTop && oldBottom != newBottom)
+                OnSeatChanged(oldBottom, null, bottom);
+            if (newTop != null && newTop != oldTop)
+                OnSeatChanged(null, newTop, top);
+            if (newBottom != null && newBottom != oldBottom)
+                OnSeatChanged(null, newBottom, bottom);
+            _inputNeedsSending = true;
+        }
+
+        private static Player.Player ResolvePlayer(PlayerID? id)
+        {
+            return id.HasValue && Player.Player.TryGetPlayer(id.Value, out var player) && player.isSpawned
+                ? player : null;
+        }
+
+        private void RemoveDisconnectedPlayers()
+        {
+            SeatAssignments seats = _seats.value;
+            bool changed = false;
+            if (seats.Top.HasValue && _topPlayer == null)
+            {
+                seats.Top = null;
+                changed = true;
+            }
+            if (seats.Bottom.HasValue && _bottomPlayer == null)
+            {
+                seats.Bottom = null;
+                changed = true;
+            }
+            if (changed)
+                _seats.value = seats;
+        }
+
         private void OnSeatChanged(Player.Player oldPlayer, Player.Player newPlayer, Transform seat)
         {
             if (oldPlayer != null && oldPlayer.Seat == seat)
@@ -99,7 +234,7 @@ namespace DwarfSimulator.Car
 
             if (newPlayer != null)
             {
-                newPlayer.SitIn(seat);
+                newPlayer.SitIn(seat, GetComponent<Interactable>(), seat == top ? "Direction" : "Pedales");
                 if (newPlayer.isOwner && newPlayer.TryGetComponent(out Player.CameraSync newCamera))
                 {
                     if (seat == bottom)
@@ -108,10 +243,6 @@ namespace DwarfSimulator.Car
                         newCamera.LockThirdPerson();
                 }
             }
-
-            _lastInput = default;
-            if (isServer)
-                RefreshControlMode();
         }
 
         private void TurnWheels()
@@ -121,48 +252,105 @@ namespace DwarfSimulator.Car
                 wheel.SteerAngle = angle;
         }
 
-        private static bool IsLocal(SyncLazyRef<Player.Player> seat) => seat.value != null && seat.value.isOwner;
-
-        private static bool IsSeatedBy(SyncLazyRef<Player.Player> seat, PlayerID player) =>
-            seat.value != null && seat.value.owner == player;
-
         [ServerRpc(requireOwnership: false)]
         private void RequestSeatRpc(bool onTop, RPCInfo info = default)
         {
-            var seat = onTop ? _topSeat : _bottomSeat;
-            var otherSeat = onTop ? _bottomSeat : _topSeat;
-            if (seat.value != null || !Player.Player.TryGetPlayer(info.sender, out var player))
+            if (!Player.Player.TryGetPlayer(info.sender, out var player))
+            {
+                SeatRequestFailed(info.sender, "Joueur indisponible");
                 return;
+            }
+            SeatAssignments seats = _seats.value;
+            if (!seats.TryAssign(info.sender, onTop, out SeatAssignments updated))
+            {
+                SeatRequestFailed(info.sender, "Place occupee ou deja selectionnee");
+                return;
+            }
+            bool alreadySeatedHere = seats.Top == info.sender || seats.Bottom == info.sender;
+            if (!alreadySeatedHere)
+            {
+                if (player.IsSeated)
+                {
+                    SeatRequestFailed(info.sender, "Vous etes deja assis");
+                    return;
+                }
+                var interaction = player.GetComponent<Player.PlayerInteract>();
+                if (interaction == null)
+                {
+                    Debug.LogError("Cannot validate a seat request without a player interaction component.", this);
+                    SeatRequestFailed(info.sender, "Interaction indisponible");
+                    return;
+                }
+                if (!TryGetInteractionDistance(player.transform.position + Vector3.up * 0.8f, out float distance))
+                {
+                    Debug.LogError("Cannot validate a seat request without an active car collider.", this);
+                    SeatRequestFailed(info.sender, "Interaction indisponible");
+                    return;
+                }
+                if (distance > interaction.InteractDistance)
+                {
+                    SeatRequestFailed(info.sender, "Trop loin");
+                    return;
+                }
+            }
 
-            seat.value = player;
-            if (otherSeat.value == player)
-                otherSeat.value = null;
+            _seats.value = updated;
+        }
+
+        private bool TryGetInteractionDistance(Vector3 origin, out float distance)
+        {
+            distance = float.PositiveInfinity;
+            Interactable interactable = GetComponent<Interactable>();
+            foreach (Collider body in GetComponentsInChildren<Collider>())
+            {
+                if (!body.enabled || body.isTrigger ||
+                    (Physics.DefaultRaycastLayers & (1 << body.gameObject.layer)) == 0 ||
+                    body.GetComponentInParent<Interactable>() != interactable)
+                    continue;
+
+                distance = Mathf.Min(distance, Vector3.Distance(origin, body.ClosestPoint(origin)));
+            }
+            return !float.IsPositiveInfinity(distance);
+        }
+
+        [TargetRpc]
+        private void SeatRequestFailed(PlayerID target, string message)
+        {
+            InteractorUI ui = FindAnyObjectByType<InteractorUI>();
+            if (ui != null)
+                ui.ShowMessage(message);
+            else
+                Debug.LogWarning(message, this);
         }
 
         [ServerRpc(requireOwnership: false)]
         private void LeaveSeatRpc(RPCInfo info = default)
         {
-            if (IsSeatedBy(_topSeat, info.sender))
-                _topSeat.value = null;
-            if (IsSeatedBy(_bottomSeat, info.sender))
-                _bottomSeat.value = null;
+            SeatAssignments seats = _seats.value;
+            if (seats.Top == info.sender)
+                seats.Top = null;
+            else if (seats.Bottom == info.sender)
+                seats.Bottom = null;
+            else
+                return;
+            _seats.value = seats;
         }
 
         [ServerRpc(requireOwnership: false)]
         private void SendInputRpc(float steer, float throttle, float brake, RPCInfo info = default)
         {
-            if (IsSeatedBy(_topSeat, info.sender))
+            if (_seats.value.Top == info.sender)
                 _driver.SetRemoteSteer(steer);
-            if (IsSeatedBy(_bottomSeat, info.sender))
+            if (_seats.value.Bottom == info.sender)
                 _driver.SetRemotePedals(throttle, brake);
         }
 
         private void RefreshControlMode()
         {
             var mode = PlayerCarControl.ControlMode.None;
-            if (_topSeat.value != null)
+            if (_seats.value.Top.HasValue)
                 mode |= PlayerCarControl.ControlMode.Steering;
-            if (_bottomSeat.value != null)
+            if (_seats.value.Bottom.HasValue)
                 mode |= PlayerCarControl.ControlMode.Speed;
             _driver.SetControlMode(mode);
         }

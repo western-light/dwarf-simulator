@@ -1,0 +1,10 @@
+{
+    "name": "DwarfSimulator.Interaction.Tests",
+    "references": [
+        "DwarfSimulator.Player",
+        "DwarfSimulator.Car",
+        "PurrNet.Runtime"
+    ],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"]
+}

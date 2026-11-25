@@ -1,5 +1,6 @@
 using PurrNet;
 using UnityEngine;
+using DwarfSimulator.Player.Interactor;
 
 namespace DwarfSimulator.Player
 {
@@ -15,6 +16,8 @@ namespace DwarfSimulator.Player
 
         public Transform Seat { get; private set; }
         public bool IsSeated => Seat != null;
+        public Interactable SeatInteractable { get; private set; }
+        public string SeatDescription { get; private set; }
 
         private void Awake()
         {
@@ -46,9 +49,11 @@ namespace DwarfSimulator.Player
             _customisationLoader.ApplyCustomisation(data);
         }
 
-        public void SitIn(Transform seat)
+        public void SitIn(Transform seat, Interactable seatInteractable, string seatDescription)
         {
             Seat = seat;
+            SeatInteractable = seatInteractable;
+            SeatDescription = seatDescription;
             _networkTransform.enabled = false;
             _collider.enabled = false;
             _rigidbody.isKinematic = true;
@@ -58,6 +63,8 @@ namespace DwarfSimulator.Player
         public void GetOut(Vector3 position, Quaternion rotation)
         {
             Seat = null;
+            SeatInteractable = null;
+            SeatDescription = null;
             _collider.enabled = true;
             _rigidbody.isKinematic = false;
             transform.SetPositionAndRotation(position, rotation);
