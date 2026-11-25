@@ -8,7 +8,7 @@ namespace DwarfSimulator.Player
     /// (idle, walk/run, jump/fall/landing, slopes, sitting, interaction reach).
     /// State is derived from the transform movement, so it works identically for remote players.
     /// </summary>
-    [DefaultExecutionOrder(100)]
+    [DefaultExecutionOrder(100)] // after FGroundRotator (order 0) so it reads the aligned rotation
     public class GnomeAvatar : MonoBehaviour
     {
         private const string ResourcePath = "Player/gnome";
@@ -34,7 +34,8 @@ namespace DwarfSimulator.Player
 
         [Header("Ground")]
         [SerializeField] private float groundCheckDistance = 0.35f;
-        [SerializeField] private float maxSlopeTilt = 25f;
+        [SerializeField, Range(1f, 30f)] private float slopeFittingSpeed = 8f;
+        [SerializeField, Range(0f, 90f)] private float maxSlopeTilt = 25f;
         [SerializeField] private float jumpReferenceSpeed = 5f;
 
         private sealed class Bone
@@ -74,7 +75,6 @@ namespace DwarfSimulator.Player
         private Bone _lUpLeg, _rUpLeg, _lLowLeg, _rLowLeg, _lFoot, _rFoot;
         private Bone _lArm, _rArm, _lForeArm, _rForeArm;
 
-        private Vector3 _lastPosition;
         private float _speed;
         private float _verticalSpeed;
         private float _phase;
@@ -82,8 +82,7 @@ namespace DwarfSimulator.Player
         private float _landing;
         private bool _wasGrounded = true;
         private bool _grounded = true;
-        private Vector3 _groundNormal = Vector3.up;
-        private Quaternion _tilt = Quaternion.identity;
+        private Behaviour _groundRotator;
         private float _interactTime = -1f;
 
         private const float InteractDuration = 0.7f;
@@ -94,7 +93,8 @@ namespace DwarfSimulator.Player
         {
             _player = GetComponent<Player>();
             Build();
-            _lastPosition = transform.position;
+            _samplePosition = transform.position;
+            _sampleTime = Time.time;
         }
 
         private void Build()
@@ -106,6 +106,7 @@ namespace DwarfSimulator.Player
                 _modelRestRotation = _model.localRotation;
                 CacheBones();
                 DisableAnimators();
+                EnsureGroundRotator();
                 return;
             }
 
@@ -133,6 +134,7 @@ namespace DwarfSimulator.Player
             ApplyParts();
             CacheBones();
             DisableAnimators();
+            EnsureGroundRotator();
         }
 
         // A gnome placed directly in the player prefab (child containing the "Hips" bone).
@@ -220,7 +222,7 @@ namespace DwarfSimulator.Player
             UpdateBlends(dt);
 
             ResetBones();
-            ApplyTilt(dt);
+            UpdateGroundRotator();
 
             Pose pose = Pose.Lerp(LocomotionPose(), AirPose(), _airBlend);
             pose = Pose.Lerp(pose, SeatedPose(), _seatBlend);
@@ -229,34 +231,47 @@ namespace DwarfSimulator.Player
             Apply(pose);
         }
 
+        private const float SampleWindow = 0.1f;
+        private const float AirGrace = 0.08f;
+
+        private Vector3 _samplePosition;
+        private float _sampleTime;
+        private Vector3 _rawVelocity;
+        private float _airTime;
+
         private void Track(float dt)
         {
-            Vector3 delta = transform.position - _lastPosition;
-            _lastPosition = transform.position;
+            bool seated = _player != null && _player.IsSeated;
+            Vector3 position = transform.position;
 
-            if (_player != null && _player.IsSeated || delta.sqrMagnitude > 9f)
+            // Physics-driven movement is stepped, so velocity is measured over a window, not per frame.
+            float elapsed = Time.time - _sampleTime;
+            if (elapsed >= SampleWindow)
             {
-                _speed = Mathf.Lerp(_speed, 0f, 1f - Mathf.Exp(-15f * dt));
-                _verticalSpeed = 0f;
+                Vector3 delta = position - _samplePosition;
+                _rawVelocity = delta.sqrMagnitude > 9f ? Vector3.zero : delta / elapsed;
+                _samplePosition = position;
+                _sampleTime = Time.time;
             }
-            else
-            {
-                Vector3 v = delta / dt;
-                float horizontal = new Vector2(v.x, v.z).magnitude;
-                _speed = Mathf.Lerp(_speed, horizontal, 1f - Mathf.Exp(-14f * dt));
-                _verticalSpeed = Mathf.Lerp(_verticalSpeed, v.y, 1f - Mathf.Exp(-20f * dt));
-            }
+            if (seated)
+                _rawVelocity = Vector3.zero;
+
+            float horizontal = new Vector2(_rawVelocity.x, _rawVelocity.z).magnitude;
+            _speed = Mathf.Lerp(_speed, horizontal, 1f - Mathf.Exp(-8f * dt));
+            _verticalSpeed = Mathf.Lerp(_verticalSpeed, _rawVelocity.y, 1f - Mathf.Exp(-12f * dt));
 
             _wasGrounded = _grounded;
-            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            Vector3 origin = position + Vector3.up * 0.1f;
             bool hit = Physics.Raycast(origin, Vector3.down, out RaycastHit info, 0.1f + groundCheckDistance,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
-            _grounded = hit && _verticalSpeed < 2.5f;
-            _groundNormal = hit ? info.normal : Vector3.up;
+            bool rising = _verticalSpeed > 2.5f;
+            _airTime = hit && !rising ? 0f : _airTime + dt;
+            _grounded = _airTime < AirGrace;
 
             if (_grounded && !_wasGrounded)
                 _landing = Mathf.Clamp01(-_prevFallSpeed / 9f);
-            _prevFallSpeed = _verticalSpeed;
+            if (!_grounded)
+                _prevFallSpeed = _verticalSpeed;
         }
 
         private float _prevFallSpeed;
@@ -291,18 +306,49 @@ namespace DwarfSimulator.Player
             }
         }
 
-        private void ApplyTilt(float dt)
+        private const string GroundRotatorType = "FIMSpace.GroundFitter.FGroundRotator, Assembly-CSharp";
+
+        // FGroundRotator lives in Assembly-CSharp (no asmdef), so it is configured by reflection.
+        private void EnsureGroundRotator()
         {
-            Quaternion target = Quaternion.identity;
-            if (_grounded && _seatBlend < 0.5f)
+            foreach (Behaviour b in _model.GetComponents<Behaviour>())
+                if (b != null && b.GetType().Name == "FGroundRotator")
+                {
+                    _groundRotator = b;
+                    return;
+                }
+
+            System.Type type = System.Type.GetType(GroundRotatorType);
+            if (type == null)
             {
-                target = Quaternion.FromToRotation(Vector3.up, _groundNormal);
-                if (Quaternion.Angle(Quaternion.identity, target) > maxSlopeTilt)
-                    target = Quaternion.RotateTowards(Quaternion.identity, target, maxSlopeTilt);
+                Debug.LogWarning("FGroundRotator not found, slope alignment disabled", this);
+                return;
             }
 
-            _tilt = Quaternion.Slerp(_tilt, target, 1f - Mathf.Exp(-10f * dt));
-            _model.rotation = _tilt * transform.rotation * _modelRestRotation;
+            _model.gameObject.SetActive(false);
+            _groundRotator = (Behaviour)_model.gameObject.AddComponent(type);
+            Set("RootTransform", transform);
+            Set("TransformToRotate", _model);
+            Set("GroundLayerMask", (LayerMask)Physics.DefaultRaycastLayers);
+            Set("FittingSpeed", slopeFittingSpeed);
+            Set("MaxForwardRotation", maxSlopeTilt);
+            Set("MaxHorizontalRotation", maxSlopeTilt);
+            Set("RelativeLookUp", false);
+            Set("GlueToGround", false);
+            _model.gameObject.SetActive(true);
+        }
+
+        private void Set(string field, object value) =>
+            _groundRotator.GetType().GetField(field)?.SetValue(_groundRotator, value);
+
+        private void UpdateGroundRotator()
+        {
+            if (_groundRotator == null)
+                return;
+            bool seated = _seatBlend > 0.5f;
+            _groundRotator.enabled = !seated;
+            if (seated)
+                _model.localRotation = _modelRestRotation;
         }
 
         private Pose LocomotionPose()
@@ -391,7 +437,7 @@ namespace DwarfSimulator.Player
 
         private void Apply(in Pose p)
         {
-            Quaternion frame = _tilt * transform.rotation;
+            Quaternion frame = _model.rotation * Quaternion.Inverse(_modelRestRotation);
             Vector3 right = frame * Vector3.right;
             Vector3 up = frame * Vector3.up;
             Vector3 fwd = frame * Vector3.forward;

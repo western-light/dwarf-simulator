@@ -92,10 +92,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4642686354741376974}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2498589167301376129}
+      addedObject: {fileID: 7004656803248121152}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4461168044264314631}
@@ -110,10 +107,16 @@ PrefabInstance:
       addedObject: {fileID: 8513494744969507227}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6399670544279684676}
+      addedObject: {fileID: 4116438604919290511}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4116438604919290511}
+      addedObject: {fileID: -412617198823338290}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7002051637861764416}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7772945992948341324}
   m_SourcePrefab: {fileID: 100100000, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
 --- !u!4 &2737815149544001521 stripped
 Transform:
@@ -125,31 +128,8 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
   m_PrefabInstance: {fileID: 2482632530495121434}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4642686354741376974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3365733683472405835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a023d73572b646cf8e6f0d570384ac4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Player
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _isSetup: 0
-  _prefabId: -2147483648
-  _hasPrefabScope: 0
-  _prefabScope: 0
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
---- !u!65 &2498589167301376129
-BoxCollider:
+--- !u!136 &7004656803248121152
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -166,9 +146,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.51815796, y: 0.92845917, z: 0.57873535}
-  m_Center: {x: -0.014419556, y: 0.48108864, z: 0.012420654}
+  serializedVersion: 2
+  m_Radius: 0.26817322
+  m_Height: 1.0733595
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.51410055, z: -0.0016937256}
 --- !u!54 &4461168044264314631
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -177,7 +159,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3365733683472405835}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 45
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -262,21 +244,6 @@ MonoBehaviour:
   moveSpeed: 2
   runSpeed: 5
   jumpForce: 5
---- !u!114 &6399670544279684676
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3365733683472405835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06b4ed84898c49b6a8d4ee13d421c458, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PlayerInteract
-  interactDistance: 5
-  holdDuration: 0.35
-  screenTolerance: 0.22
 --- !u!114 &4116438604919290511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,3 +271,74 @@ MonoBehaviour:
   stabilizedHeightSmoothTime: 0.15
   stabilizedMaxHeightDeviation: 0.3
   stabilizedYawSmoothTime: 0.1
+--- !u!114 &-412617198823338290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3365733683472405835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11762e3592c5a0ab69d95aa4f143717e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.GnomeAvatar
+  modelPrefab: {fileID: 0}
+  modelScale: 1
+  modelYaw: 0
+  visibleParts:
+  - Beard_Short
+  - Brows_Bushy
+  - Eyes_Round
+  - Hat_Pointy
+  - Nose_Round
+  - Shoes_Round
+  walkSpeed: 2.5
+  runSpeed: 5
+  strideLength: 1
+  legSwing: 28
+  runLegSwing: 48
+  armSwing: 25
+  hipBob: 0.04
+  groundCheckDistance: 0.35
+  slopeFittingSpeed: 8
+  maxSlopeTilt: 25
+  jumpReferenceSpeed: 5
+--- !u!114 &7002051637861764416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3365733683472405835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a023d73572b646cf8e6f0d570384ac4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.Player
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+--- !u!114 &7772945992948341324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3365733683472405835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b4ed84898c49b6a8d4ee13d421c458, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PlayerInteract
+  interactDistance: 5
+  holdDuration: 0.35
+  screenTolerance: 0.22
