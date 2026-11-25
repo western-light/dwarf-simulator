@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using PurrNet.UI;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using PurrNet.Lobby;
 using PurrNet;
 using PurrNet.Transports;
@@ -36,16 +37,22 @@ namespace DwarfSimulator.Lobby
         [SerializeField] private Vector3 _persoOffset;
         [SerializeField] private Vector3 _persoScale;
         [SerializeField] private TMP_InputField _lobbyCode;
-        [SerializeField] ToggleElement _publicToggle;
+        [SerializeField] private Button _copyCodeButton;
+        [SerializeField] private Button _visibilityButton;
+        [SerializeField] private TMP_Text _visibilityLabel;
+        [SerializeField] private Image _visibilityIcon;
+        [SerializeField] private Sprite _publicIcon;
+        [SerializeField] private Sprite _privateIcon;
         [SerializeField] private GameObject _startButton;
         [Space]
 
 
         [SerializeField] private LobbyManager _lobbyManager;
 
-        [SerializeField] private ButtonElement _microphoneButton;
-        [SerializeField] private TMP_Text _microphoneText;
         [SerializeField] private GameObject _microphoneFeature;
+        [SerializeField] private Image _microphoneIcon;
+        [SerializeField] private Sprite _microphoneOnIcon;
+        [SerializeField] private Sprite _microphoneOffIcon;
         [Space]
         [SerializeField] private float _timeToStartGame = 3f;
         [SerializeField] private TMP_Text _lobbyStatus;
@@ -69,10 +76,7 @@ namespace DwarfSimulator.Lobby
         private bool _lobbyEventsUnsubscribed;
         private string _connectedHostId;
         private bool _isPublic;
-        private bool _syncingPublicToggle;
         private ILobby _visibilityChangeLobby;
-        private RectTransform _publicToggleKnob;
-        private RectangleGraphic _publicToggleBackground;
 
         private GameOrchestrator _orchestrator;
 
@@ -111,7 +115,8 @@ namespace DwarfSimulator.Lobby
             _lobby = lobby;
             _orchestrator.activeLobby = lobby;
             _isPublic = ReadPublicVisibility(lobby);
-            RefreshPublicToggle();
+            RefreshLobbyCode();
+            RefreshOwnerControls();
 
             // Destruction is terminal and replays on subscription. Observe it before
             // replaying player joins, which can otherwise start a transient connection
@@ -130,7 +135,6 @@ namespace DwarfSimulator.Lobby
             PublishLocalCustomisation();
             showRock();
             RenderPlayerList(lobby);
-            _lobbyCode.text = lobby.joinCode;
             _microphoneFeature.SetActive(false);
             ConnectToLobby(lobby);
             _lobbyManager.GoToLobby();
@@ -146,43 +150,9 @@ namespace DwarfSimulator.Lobby
 
         void OnEnable()
         {
-            RefreshPublicToggle();
-            if (_publicToggle)
-                _publicToggle.onToggled += OnToggleVisibility;
-        }
-
-        void OnDisable()
-        {
-            if (_publicToggle)
-                _publicToggle.onToggled -= OnToggleVisibility;
-        }
-
-        private void LateUpdate()
-        {
-            if (!_publicToggle || !_publicToggle.gameObject.activeInHierarchy)
-                return;
-
-            // The menu prefab saves the knob on the right and has several theme
-            // bindings. Apply the confirmed state after their visual updates.
-            if (!_publicToggleKnob)
-                _publicToggleKnob = _publicToggle.transform.Find("Nob") as RectTransform;
-            if (!_publicToggleBackground)
-                _publicToggleBackground = _publicToggle.GetComponent<RectangleGraphic>();
-
-            if (_publicToggleKnob && _publicToggle.transform is RectTransform track)
-            {
-                float offset = Mathf.Max(0f, (track.rect.width - _publicToggleKnob.rect.width) * 0.5f - 2f);
-                var position = _publicToggleKnob.anchoredPosition;
-                position.x = _isPublic ? offset : -offset;
-                _publicToggleKnob.anchoredPosition = position;
-            }
-            if (_publicToggleBackground)
-            {
-                _publicToggleBackground.color = Color.white;
-                _publicToggleBackground.graphicColor = _isPublic
-                    ? new Color(0.016f, 0.518f, 0.965f)
-                    : new Color(0.153f, 0.153f, 0.157f);
-            }
+            RefreshLobbyCode();
+            RefreshOwnerControls();
+            UpdateMicGraphics();
         }
 
         private void OnDestroy()
@@ -285,48 +255,49 @@ namespace DwarfSimulator.Lobby
 
         public void CopyLobbyCodeToClipboard()
         {
-            GUIUtility.systemCopyBuffer = _lobby.joinCode;
-            // Toaster.Push("Lobby Code", "Code copied to clipboard!");
+            var code = _lobby?.joinCode;
+            if (!_closingLobby && !string.IsNullOrEmpty(code))
+                GUIUtility.systemCopyBuffer = code;
         }
 
-        private void OnToggleVisibility(bool isOn)
+        private void RefreshLobbyCode()
         {
-            if (_syncingPublicToggle)
-                return;
-
-            if (_lobby == null || _closingLobby || _gameStarted || !_lobby.isOwner ||
-                ReferenceEquals(_visibilityChangeLobby, _lobby))
-            {
-                RefreshPublicToggle();
-                return;
-            }
-
-            ChangeVisibilityAsync(_lobby, isOn).Forget("[Lobby] Visibility change failed");
+            string code = _closingLobby ? string.Empty : _lobby?.joinCode ?? string.Empty;
+            _lobbyCode.SetTextWithoutNotify(code);
+            _copyCodeButton.interactable = code.Length > 0;
         }
 
-        private void RefreshPublicToggle()
+        public void ToggleVisibility()
         {
-            RefreshOwnerControls();
-            if (!_publicToggle)
-                return;
+            if (CanChangeVisibility())
+                ChangeVisibilityAsync(_lobby, !_isPublic).Forget("[Lobby] Visibility change failed");
+        }
 
-            _syncingPublicToggle = true;
-            try
-            {
-                _publicToggle.value = _isPublic;
-            }
-            finally
-            {
-                _syncingPublicToggle = false;
-            }
+        private bool CanChangeVisibility()
+        {
+            return _lobby?.isOwner == true && !_closingLobby && !_gameStarted &&
+                   !ReferenceEquals(_visibilityChangeLobby, _lobby);
+        }
+
+        private void RefreshVisibilityButton()
+        {
+            _visibilityButton.interactable = CanChangeVisibility();
+            _visibilityLabel.text = _isPublic ? "Public" : "Private";
+            _visibilityIcon.sprite = _isPublic ? _publicIcon : _privateIcon;
         }
 
         private void RefreshOwnerControls()
         {
             bool isOwner = _lobby?.isOwner == true && !_closingLobby;
-            if (_publicToggle)
-                SetOwnerControlState(_publicToggle.transform.parent.gameObject, isOwner);
+            RefreshVisibilityButton();
             SetOwnerControlState(_startButton, isOwner);
+            RefreshStartButton();
+        }
+
+        private void RefreshStartButton()
+        {
+            if (_startButton && _startButton.TryGetComponent<Button>(out var button))
+                button.interactable = CanStartGame();
         }
 
         private static void SetOwnerControlState(GameObject control, bool isOwner)
@@ -374,7 +345,7 @@ namespace DwarfSimulator.Lobby
         {
             _visibilityChangeLobby = targetLobby;
             // Display the confirmed value until EOS accepts the change.
-            RefreshPublicToggle();
+            RefreshVisibilityButton();
             try
             {
                 await SetEOSVisibilityAsync(targetLobby, isPublic);
@@ -389,7 +360,7 @@ namespace DwarfSimulator.Lobby
                 if (ReferenceEquals(_visibilityChangeLobby, targetLobby))
                     _visibilityChangeLobby = null;
                 if (this && ReferenceEquals(_lobby, targetLobby))
-                    RefreshPublicToggle();
+                    RefreshVisibilityButton();
             }
         }
 
@@ -517,7 +488,7 @@ namespace DwarfSimulator.Lobby
             if (key == LOBBY_PUBLIC)
             {
                 _isPublic = value == "1";
-                RefreshPublicToggle();
+                RefreshVisibilityButton();
                 return;
             }
 
@@ -550,6 +521,7 @@ namespace DwarfSimulator.Lobby
                 return;
 
             _gameStarted = true;
+            RefreshOwnerControls();
             SetLoadingStatus();
             var startingLobby = _lobby;
             LaunchGame(async loadingView =>
@@ -654,7 +626,8 @@ namespace DwarfSimulator.Lobby
             _lobby = null;
             _localPlayerId = null;
             _isPublic = false;
-            RefreshPublicToggle();
+            RefreshLobbyCode();
+            RefreshOwnerControls();
             ClearPlayerEntries();
             if (_lobbyManager)
             {
@@ -801,17 +774,7 @@ namespace DwarfSimulator.Lobby
 
         private void UpdateMicGraphics()
         {
-            _microphoneText.text = _hasLocalMicEnabled ? "<icon=microphone>" : "<icon=microphone_off>";
-
-            // TODO :
-            // var color = _hasLocalMicEnabled ? _unmutedColor : _mutedColor;
-            // var highlight = _hasLocalMicEnabled ? _unmutedHover : _mutedHover;
-
-            // ThemeColors.Set(_microphoneButton, color, highlight,
-            //     _hasLocalMicEnabled ? _unmutedColorTone : _mutedColorTone,
-            //     _hasLocalMicEnabled ? _unmutedHoverTone : _mutedHoverTone);
-            // color.contrast = true;
-            // ThemeColors.Set(_microphoneText, color);
+            _microphoneIcon.sprite = _hasLocalMicEnabled ? _microphoneOnIcon : _microphoneOffIcon;
         }
 
         private void ResetStatusLabels()
@@ -835,6 +798,7 @@ namespace DwarfSimulator.Lobby
             }
 
             UpdateLocalPlayerData(lobby);
+            RefreshStartButton();
         }
 
         private void CreatePlayerEntry(IPlayer player, int index)
