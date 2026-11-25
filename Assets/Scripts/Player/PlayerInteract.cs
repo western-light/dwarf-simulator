@@ -283,6 +283,7 @@ namespace DwarfSimulator.Player
                 return;
             }
             target.Choices[index].OnInteract?.Invoke(_player);
+            _player.NotifyInteract();
         }
 
         private void OpenInteraction(Interactable target)

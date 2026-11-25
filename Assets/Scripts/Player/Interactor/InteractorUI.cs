@@ -195,7 +195,10 @@ namespace DwarfSimulator.Player.Interactor
             if (reason != null)
                 ShowMessage(reason);
             else
+            {
                 choice?.OnInteract?.Invoke(interactor);
+                interactor.NotifyInteract();
+            }
         }
 
         public void StopInteract()

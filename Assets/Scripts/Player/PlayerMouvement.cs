@@ -36,6 +36,8 @@ namespace DwarfSimulator.Player
 
         void Start()
         {
+            if (_anim != null && (!_anim.enabled || _anim.runtimeAnimatorController == null))
+                _anim = null;
             _playerCamera = Camera.main.transform;
             _moveAction = InputSystem.actions.FindAction("Move");
             _runAction = InputSystem.actions.FindAction("Sprint");
@@ -63,8 +65,8 @@ namespace DwarfSimulator.Player
             if (_player.IsSeated || _interactionFrozen)
             {
                 _jumpRequested = false;
-                _anim.SetBool("Walk", false);
-                _anim.SetBool("Run", false);
+                if (_anim != null) _anim.SetBool("Walk", false);
+                if (_anim != null) _anim.SetBool("Run", false);
                 _lastMoveDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
                 return;
             }
@@ -78,8 +80,8 @@ namespace DwarfSimulator.Player
             bool run = _runAction.IsPressed();
             float speed = run ? runSpeed : moveSpeed;
             
-            _anim.SetBool("Walk", moveDirection.magnitude > 0);
-            _anim.SetBool("Run", run);
+            if (_anim != null) _anim.SetBool("Walk", moveDirection.magnitude > 0);
+            if (_anim != null) _anim.SetBool("Run", run);
             
             _rb.MovePosition(transform.position + moveDirection * Time.fixedDeltaTime * speed);
             if (_lastMoveDirection.sqrMagnitude > 0.01f)
@@ -89,7 +91,7 @@ namespace DwarfSimulator.Player
             if ((_jumpAction.IsPressed() || jumpBuffered) && IsGrounded())
             {
                 _jumpRequested = false;
-                _anim.SetTrigger("Jump");
+                if (_anim != null) _anim.SetTrigger("Jump");
                 _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
             else if (_jumpRequested && !jumpBuffered)

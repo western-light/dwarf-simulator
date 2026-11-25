@@ -12,6 +12,7 @@ namespace DwarfSimulator.Player
         private Rigidbody _rigidbody;
         private NetworkTransform _networkTransform;
         private PlayerCustomisationLoader _customisationLoader;
+        private GnomeAvatar _avatar;
         private readonly SyncVar<PlayerCustomisation> _customisation = new(ownerAuth: true);
 
         public Transform Seat { get; private set; }
@@ -25,7 +26,25 @@ namespace DwarfSimulator.Player
             _rigidbody = GetComponent<Rigidbody>();
             _networkTransform = GetComponent<NetworkTransform>();
             _customisationLoader = GetComponent<PlayerCustomisationLoader>();
+            _avatar = GetComponent<GnomeAvatar>();
+            if (_avatar == null)
+                _avatar = gameObject.AddComponent<GnomeAvatar>();
         }
+
+        public void NotifyInteract()
+        {
+            if (IsSeated)
+                return;
+            _avatar.PlayInteract();
+            if (isSpawned && isOwner)
+                InteractServerRpc();
+        }
+
+        [ServerRpc]
+        private void InteractServerRpc() => InteractObserversRpc();
+
+        [ObserversRpc(excludeOwner: true)]
+        private void InteractObserversRpc() => _avatar.PlayInteract();
 
         protected override void OnSpawned()
         {
