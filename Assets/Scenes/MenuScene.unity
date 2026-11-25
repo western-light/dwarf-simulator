@@ -3383,8 +3383,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.20834722, y: 0.05604967, z: -0.011960365, w: 0.9763744}
-  m_LocalPosition: {x: 144.13, y: 3.34, z: 279.54}
+  m_LocalRotation: {x: 0.022681203, y: -0.71613497, z: 0.023297057, w: 0.69720405}
+  m_LocalPosition: {x: 143.002, y: 3.741, z: 274.919}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3959,8 +3959,8 @@ MonoBehaviour:
   - {fileID: 751515099}
   - {fileID: 491481877}
   _prefabPerso: {fileID: 6176887594042252844, guid: 99851715e54bcdc039f167d05a4704f8, type: 3}
-  _persoOffset: {x: -0.0285, y: 0.0083, z: 0.0024}
-  _persoScale: {x: 1, y: 1, z: 1}
+  _persoOffset: {x: -0.0285, y: 0.0083, z: 0.0174}
+  _persoScale: {x: 0.1, y: 0.1, z: 0.1}
   _lobbyCode: {fileID: 1893272810}
   _publicToggle: {fileID: 1345761336}
   _startButton: {fileID: 212582293}
@@ -5343,7 +5343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineSplineDolly
   m_SplineSettings:
     Spline: {fileID: 1669635956}
-    Position: 4
+    Position: 2
     Units: 2
   SplineOffset: {x: 0, y: 0, z: 0}
   CameraRotation: 0
@@ -5414,8 +5414,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 653027889}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.20834722, y: 0.05604967, z: -0.011960365, w: 0.9763744}
-  m_LocalPosition: {x: 144.13, y: 3.34, z: 279.54}
+  m_LocalRotation: {x: 0.022681203, y: -0.71613497, z: 0.023297057, w: 0.69720405}
+  m_LocalPosition: {x: 143.002, y: 3.741, z: 274.919}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9647,11 +9647,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0efea702ca965d15bb163b8e18c21d59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: DwarfSimulator.Player::DwarfSimulator.Player.PersoCustomisationLoader
-  _colorValues:
-  - {r: 1, g: 0.8816934, b: 0, a: 0}
-  - {r: 1, g: 0, b: 0, a: 0}
-  - {r: 0, g: 1, b: 0.015245736, a: 0}
-  - {r: 0.96872926, g: 0, b: 1, a: 0}
   _bodyForColor: {fileID: 184392382}
   _beardValues:
   - {fileID: 0}
@@ -19915,7 +19910,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 146.3509
+      value: 146.35832
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalPosition.y
@@ -19923,23 +19918,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 283.91122
+      value: 283.91473
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.63571197
+      value: 0.68925935
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.6357121
+      value: -0.68925947
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.30962926
+      value: 0.15786542
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.30962923
+      value: 0.15786545
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -19951,7 +19946,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1014715700910091242, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 51.938
+      value: 25.801
       objectReference: {fileID: 0}
     - target: {fileID: 7006968310507774509, guid: 25508ceb44ae9d587b19b0697bcac3f1, type: 3}
       propertyPath: m_Name

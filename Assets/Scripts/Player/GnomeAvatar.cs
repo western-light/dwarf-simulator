@@ -20,6 +20,7 @@ namespace DwarfSimulator.Player
         [SerializeField] private GameObject modelPrefab;
         [SerializeField] private float modelScale = 1f;
         [SerializeField] private float modelYaw;
+        [SerializeField] private bool seatedPreview;
         [SerializeField] private string[] visibleParts =
             { "Beard_Short", "Brows_Bushy", "Eyes_Round", "Hat_Pointy", "Nose_Round", "Shoes_Round" };
 
@@ -138,6 +139,19 @@ namespace DwarfSimulator.Player
 
         private void Awake()
         {
+            if (seatedPreview)
+            {
+                _model = FindEmbeddedModel();
+                if (_model != null)
+                {
+                    _modelRestRotation = _model.localRotation;
+                    CacheBones();
+                    DisableAnimators();
+                    Apply(SeatedPose());
+                }
+                return;
+            }
+
             _player = GetComponent<Player>();
             _movement = GetComponent<PlayerMouvement>();
             _rootBody = GetComponent<Rigidbody>();
@@ -273,6 +287,16 @@ namespace DwarfSimulator.Player
         {
             if (_model == null || _hips == null)
                 return;
+
+            if (seatedPreview)
+            {
+                ResetBones();
+                Pose seatedPose = SeatedPose();
+                seatedPose.ChestRoll = 0.6f * Mathf.Sin(Time.time * 1.7f);
+                seatedPose.HeadPitch = 0.8f * Mathf.Sin(Time.time * 0.9f);
+                Apply(seatedPose);
+                return;
+            }
 
             float dt = Mathf.Max(Time.deltaTime, 1e-4f);
             Track(dt);
