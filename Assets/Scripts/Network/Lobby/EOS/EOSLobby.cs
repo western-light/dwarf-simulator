@@ -110,7 +110,10 @@ namespace DwarfSimulator.Lobby.EOS
             if (_disposed)
                 return;
 
-            LogFailure(EOSLobbyApi.LeaveLobby(_lobbyId, _localUserId), "leave lobby");
+            // EOSManager can shut down before scene objects receive OnDestroy when
+            // leaving Play Mode. There is no backend session left to notify then.
+            if (EOSLobbyApi.lobbies != null)
+                LogFailure(EOSLobbyApi.LeaveLobby(_lobbyId, _localUserId), "leave lobby");
             Dispose();
         }
 

@@ -94,13 +94,20 @@ namespace DwarfSimulator.Lobby
 
         public Task InitializeAsync()
         {
+            if (_initializationTask is { IsFaulted: true } or { IsCanceled: true })
+                _initializationTask = null;
             return _initializationTask ??= InitializeProvidersAsync();
         }
 
         private async Task InitializeProvidersAsync()
         {
             if (_orchestrator.sessionProvider)
+            {
                 await _orchestrator.sessionProvider.Login(_stack);
+                if (!_orchestrator.sessionProvider.isLoggedIn)
+                    throw new InvalidOperationException(
+                        $"Session provider '{_orchestrator.sessionProvider.name}' did not produce a logged-in EOS user.");
+            }
 
             if (_orchestrator.lobbyProvider)
                 await _orchestrator.lobbyProvider.Initialize();

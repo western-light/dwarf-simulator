@@ -127,9 +127,13 @@ namespace DwarfSimulator.Lobby.EOS
 
         public static Task<Result> LeaveLobby(string lobbyId, ProductUserId userId)
         {
+            var lobbyInterface = lobbies;
+            if (lobbyInterface == null || userId == null || !userId.IsValid())
+                return Task.FromResult(Result.NotConfigured);
+
             var tcs = new TaskCompletionSource<Result>();
             var options = new LeaveLobbyOptions { LobbyId = lobbyId, LocalUserId = userId };
-            lobbies.LeaveLobby(ref options, null, (ref LeaveLobbyCallbackInfo info) =>
+            lobbyInterface.LeaveLobby(ref options, null, (ref LeaveLobbyCallbackInfo info) =>
             {
                 if (Common.IsOperationComplete(info.ResultCode))
                     tcs.TrySetResult(info.ResultCode);

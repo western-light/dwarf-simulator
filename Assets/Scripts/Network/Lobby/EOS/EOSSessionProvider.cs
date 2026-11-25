@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Epic.OnlineServices;
 using PlayEveryWare.EpicOnlineServices;
@@ -48,15 +49,15 @@ namespace DwarfSimulator.Lobby.EOS
 
         public override async Task Login(ViewStack stack)
         {
-            if (isLoggedIn)
-                return;
-
             if (EOSManager.Instance.GetEOSPlatformInterface() == null)
             {
-                Debug.LogError($"[{name}] The EOS platform is not initialized. Add an EOSManager to the menu scene and fill in the EOS configuration.");
-                return;
+                throw new InvalidOperationException(
+                    $"[{name}] The EOS platform is not initialized. Add an EOSManager to the menu scene and fill in the EOS configuration.");
             }
 
+            // Always perform a fresh Connect login. With Enter Play Mode domain reload
+            // disabled, EOSManager's static ProductUserId can briefly contain the value
+            // from the previous play session and make isLoggedIn return a stale true.
             string displayName;
             Result result;
 
@@ -72,12 +73,14 @@ namespace DwarfSimulator.Lobby.EOS
             }
 
             if (result != Result.Success)
-            {
-                Debug.LogError($"[{name}] EOS login ({_loginMethod}) failed: {result}");
-                return;
-            }
+                throw new InvalidOperationException($"[{name}] EOS login ({_loginMethod}) failed: {result}");
+
+            if (!isLoggedIn)
+                throw new InvalidOperationException(
+                    $"[{name}] EOS Connect login returned Success without a valid ProductUserId.");
 
             _playerName = displayName;
+            Debug.Log($"[{name}] EOS Connect login succeeded ({_loginMethod}), ProductUserId={playerId}.");
         }
 
         public override Task Logout()
@@ -104,8 +107,19 @@ namespace DwarfSimulator.Lobby.EOS
                     return;
                 }
 
-                EOSManager.Instance.StartConnectLoginWithDeviceToken(displayName,
-                    info => tcs.TrySetResult(info.ResultCode));
+                EOSManager.Instance.StartConnectLoginWithDeviceToken(displayName, info =>
+                {
+                    // A Device ID exists before its first Product User is created.
+                    // EOS returns InvalidUser with a continuance token in that case.
+                    if (info.ResultCode == Result.InvalidUser)
+                    {
+                        EOSManager.Instance.CreateConnectUserWithContinuanceToken(info.ContinuanceToken,
+                            createdUser => tcs.TrySetResult(createdUser.ResultCode));
+                        return;
+                    }
+
+                    tcs.TrySetResult(info.ResultCode);
+                });
             });
 
             return tcs.Task;
