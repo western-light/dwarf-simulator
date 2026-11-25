@@ -8,15 +8,23 @@ namespace DwarfSimulator.Player
     {
         public int _colorIndex;
         public int _beardIndex;
+        public int _browsIndex;
+        public int _eyesIndex;
         public int _hairIndex;
-        public int _capeIndex;
+        public int _hatIndex;
+        public int _noseIndex;
+        public int _shoesIndex;
     }
 
     public enum CustomizationType
     {
         Color,
         Beard,
+        Brows,
+        Eyes,
         Hair,
-        Cape
+        Hat,
+        Nose,
+        Shoes
     }
 }

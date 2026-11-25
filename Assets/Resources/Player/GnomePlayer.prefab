@@ -40,6 +40,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 370.064
       objectReference: {fileID: 0}
@@ -78,6 +90,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5a5e717039dc5ab6383382cd9366c09d, type: 3}
       propertyPath: m_Name
@@ -244,6 +260,12 @@ MonoBehaviour:
   moveSpeed: 2
   runSpeed: 5
   jumpForce: 5
+  maxWalkableSlopeAngle: 35
+  slideGravityMultiplier: 1
+  slideControlAcceleration: 4
+  slideFriction: 0.6
+  slideRecoveryAcceleration: 6
+  maxSlideSpeed: 12
 --- !u!114 &4116438604919290511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,10 +322,16 @@ MonoBehaviour:
   runLegSwing: 48
   armSwing: 25
   hipBob: 0.04
+  footLift: 0.07
+  upperBodySway: 2.5
+  turnCounterRotation: 12
   groundCheckDistance: 0.35
   slopeFittingSpeed: 8
   maxSlopeTilt: 25
   jumpReferenceSpeed: 5
+  ragdollSlopeAngle: 45
+  ragdollRecoveryDelay: 0.8
+  ragdollRecoveryBlendDuration: 0.6
 --- !u!114 &7002051637861764416
 MonoBehaviour:
   m_ObjectHideFlags: 0
