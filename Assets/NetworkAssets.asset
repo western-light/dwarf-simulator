@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9ac2e59ec50867458fa45964a218963, type: 3}
   m_Name: NetworkAssets
   m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.NetworkAssets
-  autoGenerate: 1
-  folder: {fileID: 102900000, guid: 00000000000000001000000000000000, type: 3}
-  searchAllIfNoFolder: 1
+  autoGenerate: 0
+  folder: {fileID: 0}
+  searchAllIfNoFolder: 0
   linkedNetworkAssets: []
   _enabledTypeNames: []
   assets: []
