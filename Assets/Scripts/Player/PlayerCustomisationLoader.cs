@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,17 +8,11 @@ namespace DwarfSimulator.Player
     public class PlayerCustomisationLoader : MonoBehaviour
     {
         private const string SaveKey = "PlayerCustomisation";
+        private const string SaveVersionKey = SaveKey + "Version";
+        private const int SaveVersion = 1;
         private const string GnomeResourcePath = "Player/gnome";
+        private const string ColorPaletteResourcePath = "Player/GnomeColorPalette";
 
-        private static readonly Color[] DefaultColors =
-        {
-            new(1f, 0.882f, 0f, 1f),
-            new(1f, 0f, 0f, 1f),
-            new(0f, 1f, 0.015f, 1f),
-            new(0.969f, 0f, 1f, 1f)
-        };
-
-        [SerializeField] private List<Color> _colorValues = new();
         [SerializeField] private GameObject _bodyForColor;
 
         [SerializeField] private List<GameObject> _beardValues = new();
@@ -29,6 +24,7 @@ namespace DwarfSimulator.Player
         [SerializeField] private List<GameObject> _shoesValues = new();
 
         private bool _bindingsReady;
+        private IReadOnlyList<Color> _colorValues = Array.Empty<Color>();
         private Renderer _colorRenderer;
         private MaterialPropertyBlock _colorProperties;
 
@@ -41,7 +37,22 @@ namespace DwarfSimulator.Player
             if (string.IsNullOrEmpty(json))
                 return new PlayerCustomisation();
 
-            return JsonUtility.FromJson<PlayerCustomisation>(json);
+            var data = JsonUtility.FromJson<PlayerCustomisation>(json);
+            if (PlayerPrefs.GetInt(SaveVersionKey) == 0)
+            {
+                // The old lists placed two beard bones and three hat bones before the meshes.
+                data._beardIndex = data._beardIndex > 2 ? data._beardIndex - 2 : 0;
+                data._hatIndex = data._hatIndex > 3 ? data._hatIndex - 3 : 0;
+            }
+
+            return data;
+        }
+
+        public static void SaveLocal(PlayerCustomisation data)
+        {
+            PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(data));
+            PlayerPrefs.SetInt(SaveVersionKey, SaveVersion);
+            PlayerPrefs.Save();
         }
 
         public void LoadLocalCustomisation()
@@ -69,6 +80,10 @@ namespace DwarfSimulator.Player
             if (_bindingsReady)
                 return;
 
+            var palette = Resources.Load<PlayerColorPalette>(ColorPaletteResourcePath);
+            if (palette != null)
+                _colorValues = palette.Colors;
+
             Transform modelRoot = FindGnomeRoot();
             if (modelRoot == null)
                 modelRoot = CreateGnomeVisual();
@@ -80,21 +95,19 @@ namespace DwarfSimulator.Player
                 return;
             }
 
-            BindParts(ref _beardValues, modelRoot, "Beard_", true);
-            BindParts(ref _browsValues, modelRoot, "Brows_", false);
-            BindParts(ref _eyesValues, modelRoot, "Eyes_", false);
-            BindParts(ref _hairValues, modelRoot, "Hair_", true);
-            BindParts(ref _hatValues, modelRoot, "Hat_", true);
-            BindParts(ref _noseValues, modelRoot, "Nose_", false);
-            BindParts(ref _shoesValues, modelRoot, "Shoes_", false);
+            Renderer[] renderers = modelRoot.GetComponentsInChildren<Renderer>(true);
+            RestoreLegacyAccessoryBones(renderers);
 
-            if (_colorValues == null)
-                _colorValues = new List<Color>();
-            if (_colorValues.Count == 0)
-                _colorValues.AddRange(DefaultColors);
+            BindParts(ref _beardValues, renderers, "Beard_", true);
+            BindParts(ref _browsValues, renderers, "Brows_", false);
+            BindParts(ref _eyesValues, renderers, "Eyes_", false);
+            BindParts(ref _hairValues, renderers, "Hair_", true);
+            BindParts(ref _hatValues, renderers, "Hat_", true);
+            BindParts(ref _noseValues, renderers, "Nose_", false);
+            BindParts(ref _shoesValues, renderers, "Shoes_", false);
 
             if (_bodyForColor == null || !_bodyForColor.transform.IsChildOf(modelRoot))
-                _bodyForColor = FindColorTarget(modelRoot);
+                _bodyForColor = FindColorTarget(renderers);
             if (_bodyForColor != null)
                 _colorRenderer = _bodyForColor.GetComponent<Renderer>();
 
@@ -103,8 +116,10 @@ namespace DwarfSimulator.Player
 
         private Transform FindGnomeRoot()
         {
-            Transform[] children = GetComponentsInChildren<Transform>(true);
-            Transform[] parts = children.Where(t => IsCustomPart(t.name)).ToArray();
+            Transform[] parts = GetComponentsInChildren<Renderer>(true)
+                .Where(renderer => IsPartRenderer(renderer) && IsCustomPart(renderer.name))
+                .Select(renderer => renderer.transform)
+                .ToArray();
             if (parts.Length == 0)
                 return null;
 
@@ -132,25 +147,39 @@ namespace DwarfSimulator.Player
             return visual.transform;
         }
 
-        private static void BindParts(ref List<GameObject> values, Transform modelRoot, string prefix, bool allowNone)
+        private void RestoreLegacyAccessoryBones(Renderer[] renderers)
         {
-            bool alreadyBound = values != null && values.Any(value => value != null &&
-                value.name.StartsWith(prefix, System.StringComparison.Ordinal) && value.transform.IsChildOf(modelRoot));
-            if (alreadyBound)
+            // Some older previews saved the listed rig bones with their GameObjects disabled.
+            var inactiveParts = _beardValues.Concat(_hatValues)
+                .Where(part => part != null && !part.activeSelf)
+                .ToHashSet();
+            if (inactiveParts.Count == 0)
                 return;
 
-            values = modelRoot.GetComponentsInChildren<Transform>(true)
-                .Where(t => t.name.StartsWith(prefix, System.StringComparison.Ordinal))
-                .OrderBy(t => t.name, System.StringComparer.Ordinal)
-                .Select(t => t.gameObject)
-                .ToList();
+            foreach (var renderer in renderers.OfType<SkinnedMeshRenderer>())
+                foreach (Transform bone in renderer.bones)
+                    if (bone != null && inactiveParts.Remove(bone.gameObject))
+                        bone.gameObject.SetActive(true);
+        }
+
+        private static bool IsPartRenderer(Renderer renderer) => renderer is MeshRenderer or SkinnedMeshRenderer;
+
+        private static void BindParts(ref List<GameObject> values, Renderer[] renderers, string prefix, bool allowNone)
+        {
+            var options = renderers
+                .Where(renderer => IsPartRenderer(renderer) && renderer.name.StartsWith(prefix, StringComparison.Ordinal))
+                .Select(renderer => renderer.gameObject)
+                .ToHashSet();
+            var configuredOptions = values?.Where(options.Contains).Distinct().ToList();
+            values = configuredOptions is { Count: > 0 }
+                ? configuredOptions
+                : options.OrderBy(part => part.name, StringComparer.Ordinal).ToList();
             if (allowNone)
                 values.Insert(0, null);
         }
 
-        private static GameObject FindColorTarget(Transform modelRoot)
+        private static GameObject FindColorTarget(Renderer[] renderers)
         {
-            Renderer[] renderers = modelRoot.GetComponentsInChildren<Renderer>(true);
             Renderer target = renderers.FirstOrDefault(r => r.name == "Gnome")
                               ?? renderers.FirstOrDefault(r => r.name == "Body")
                               ?? renderers.FirstOrDefault(r => !IsCustomPart(r.name));
@@ -197,7 +226,7 @@ namespace DwarfSimulator.Player
             EnsureBindings();
             return type switch
             {
-                CustomizationType.Color => _colorValues?.Count ?? 0,
+                CustomizationType.Color => _colorValues.Count,
                 CustomizationType.Beard => _beardValues?.Count ?? 0,
                 CustomizationType.Brows => _browsValues?.Count ?? 0,
                 CustomizationType.Eyes => _eyesValues?.Count ?? 0,

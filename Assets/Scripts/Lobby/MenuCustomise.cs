@@ -9,8 +9,6 @@ namespace DwarfSimulator.Lobby
 {
     public class MenuCustomise : MonoBehaviour
     {
-        private const string PERSO_PREF = "PlayerCustomisation";
-
         [SerializeField] private Button _saveButton;
         [Space]
         [SerializeField] private GameObject _colorLine;
@@ -42,7 +40,7 @@ namespace DwarfSimulator.Lobby
                 return;
             }
 
-            LoadPersonalisation();
+            _persoIndex = PlayerCustomisationLoader.LoadLocal();
 
             // The old menu only had four rows. Missing rows are generated from the
             // same UI template so existing scenes are migrated without manual wiring.
@@ -164,25 +162,6 @@ namespace DwarfSimulator.Lobby
             _playerCustoLoader.ApplyCustomisation(_persoIndex);
         }
 
-        private void SavePersonalisation()
-        {
-            string json = JsonUtility.ToJson(_persoIndex);
-
-            PlayerPrefs.SetString(PERSO_PREF, json);
-            PlayerPrefs.Save();
-        }
-
-        private void LoadPersonalisation()
-        {
-            if (PlayerPrefs.HasKey(PERSO_PREF))
-            {
-                string json = PlayerPrefs.GetString(PERSO_PREF);
-                _persoIndex = JsonUtility.FromJson<PlayerCustomisation>(json);
-            }
-            else
-            {
-                _persoIndex = new PlayerCustomisation();
-            }
-        }
+        private void SavePersonalisation() => PlayerCustomisationLoader.SaveLocal(_persoIndex);
     }
 }
