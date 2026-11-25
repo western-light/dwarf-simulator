@@ -6,6 +6,7 @@ namespace DwarfSimulator.Player
     public class PlayerMouvement:MonoBehaviour
     {
         private const float GroundCheckMargin = 0.05f;
+        private const float JumpBufferDuration = 0.15f;
 
         [SerializeField] private float moveSpeed = 5f;
         [SerializeField] private float runSpeed = 5f;
@@ -22,6 +23,8 @@ namespace DwarfSimulator.Player
         
         private Vector3 _lastMoveDirection;
         private bool _interactionFrozen;
+        private bool _jumpRequested;
+        private float _jumpRequestedAt;
 
         void Awake()
         {
@@ -40,10 +43,26 @@ namespace DwarfSimulator.Player
             
         }
 
+        void Update()
+        {
+            if (_player.IsSeated || _interactionFrozen)
+            {
+                _jumpRequested = false;
+                return;
+            }
+
+            if (_jumpAction.WasPressedThisFrame())
+            {
+                _jumpRequested = true;
+                _jumpRequestedAt = Time.time;
+            }
+        }
+
         void FixedUpdate()
         {
             if (_player.IsSeated || _interactionFrozen)
             {
+                _jumpRequested = false;
                 _anim.SetBool("Walk", false);
                 _anim.SetBool("Run", false);
                 _lastMoveDirection = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
@@ -66,11 +85,15 @@ namespace DwarfSimulator.Player
             if (_lastMoveDirection.sqrMagnitude > 0.01f)
                 _rb.MoveRotation(Quaternion.LookRotation(_lastMoveDirection));
             
-            if (_jumpAction.IsPressed() && IsGrounded())
+            bool jumpBuffered = _jumpRequested && Time.time - _jumpRequestedAt <= JumpBufferDuration;
+            if ((_jumpAction.IsPressed() || jumpBuffered) && IsGrounded())
             {
+                _jumpRequested = false;
                 _anim.SetTrigger("Jump");
                 _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             }
+            else if (_jumpRequested && !jumpBuffered)
+                _jumpRequested = false;
         }
 
         private bool IsGrounded()
