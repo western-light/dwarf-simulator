@@ -5,7 +5,7 @@
 1. Ouvrir `Tools > Dwarf Simulator > Low Poly World Builder`.
 2. Sculpter normalement un `Terrain` Unity puis le selectionner dans la Hierarchy.
 3. Cliquer sur **Convertir le Terrain selectionne**.
-4. Continuer a modifier la heightmap Unity et cliquer sur **Regenerer le terrain low-poly** dans l'Inspector.
+4. Depuis `LP Terrain Mesh`, cliquer sur **Afficher et selectionner le Terrain source** pour sculpter le relief ou peindre des arbres. Puis cliquer sur **Regenerer le terrain low-poly** dans l'Inspector de `LP Terrain Mesh`.
 5. Sélectionner le Terrain ou son objet `LP Terrain Mesh`, puis créer une route **Ville**, **Terre**, **Montagne**, **Fissurée** ou **Neige**.
 6. Modifier le tracé avec les outils **Splines** de Unity. Pour utiliser une spline existante, ajouter **Low Poly Road** au même objet que son `SplineContainer`.
 7. Cliquer sur **Régénérer la route** pour appliquer le tracé et le style. L’Inspector affiche le résultat ou indique ce qui bloque.
@@ -47,6 +47,10 @@ Dans les virages serrés, le bord intérieur se resserre progressivement. Le mar
 5. Utiliser `Alt + souris` pour continuer a deplacer la camera.
 
 Les coups de pinceau sont conserves et reappliques lors d'une regeneration du terrain.
+
+## Arbres peints
+
+La liste des arbres reste dans le Terrain Unity. Quand le rendu source est masque, la conversion instancie les prefabs dans `LP Trees` avec leurs colliders, leurs positions horizontales, leurs rotations et leurs tailles. Le pied de chaque arbre suit la facette sous lui. Les ajustements d'arbres se font sur le Terrain source et sont repris lors de la prochaine generation.
 
 ## Optimisations appliquees
 

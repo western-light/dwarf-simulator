@@ -40,6 +40,9 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             }
 
             target.CacheComponents();
+            Undo.RegisterCompleteObjectUndo(target, "Regenerer le terrain low-poly");
+            Undo.RecordObjects(new UnityEngine.Object[] { target.meshFilter, target.meshCollider, target.meshRenderer },
+                "Regenerer le terrain low-poly");
             TerrainData data = target.sourceTerrain.terrainData;
             int resolution = Mathf.Clamp(target.resolution, 9, 257);
             int triangleCount = (resolution - 1) * (resolution - 1) * 2;
@@ -74,13 +77,13 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             ApplyPaintStrokes(target, vertices, colors, triangles);
 
             Mesh mesh = CreateMesh("LP_Terrain_" + target.sourceTerrain.name, vertices, normals, colors, triangles, uvs);
-            Mesh savedMesh = SaveMesh(mesh, target.gameObject.name + "_Terrain", ref target.generatedMeshGuid, assetPath: meshPath);
+            Mesh savedMesh = SaveMesh(mesh, target.gameObject.name + "_Terrain", ref target.generatedMeshGuid,
+                recordUndo: true, assetPath: meshPath);
             AssignMesh(target.meshFilter, target.meshCollider, savedMesh, target.useGeneratedMeshCollider);
             target.meshRenderer.sharedMaterial = material != null ? material : CompatibleMaterial(target.meshRenderer);
             target.meshRenderer.receiveShadows = false;
-            target.sourceTerrain.drawHeightmap = !target.hideSourceRendering;
-            EditorUtility.SetDirty(target.sourceTerrain);
-            EditorUtility.SetDirty(target);
+            LowPolyTerrainTrees.Rebuild(target);
+            LowPolyTerrainTrees.SetPreview(target, false);
         }
 
         internal static bool TryBuildRoad(LowPolyRoad road, out string message)
@@ -1295,7 +1298,7 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             if (existing != null)
             {
                 if (recordUndo)
-                    Undo.RegisterCompleteObjectUndo(existing, "Régénérer la route");
+                    Undo.RegisterCompleteObjectUndo(existing, "Regenerer le mesh low-poly");
                 EditorUtility.CopySerialized(generated, existing);
                 UnityEngine.Object.DestroyImmediate(generated);
                 EditorUtility.SetDirty(existing);

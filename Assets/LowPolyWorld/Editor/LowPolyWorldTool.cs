@@ -51,8 +51,8 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             EditorGUILayout.Space(10f);
             GUILayout.Label("Low Poly World Builder", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
-                "Le Terrain Unity reste ta source de sculpture. Le mesh final utilise des triangles independants, " +
-                "des normales plates et une palette sans textures photo.", MessageType.Info);
+                "Le Terrain Unity reste ta source de sculpture et de peinture des arbres. " +
+                "La generation recale les arbres peints sur les facettes du mesh low-poly.", MessageType.Info);
 
             EditorGUILayout.Space(8f);
             GUILayout.Label("1. Terrain", EditorStyles.boldLabel);
@@ -289,13 +289,13 @@ namespace DwarfSimulator.LowPolyWorld.Editor
             {
                 LowPolyWorldMeshBuilder.BuildTerrain(terrainMesh);
             }
-            if (GUILayout.Button("Afficher de nouveau le Terrain source"))
+            if (GUILayout.Button("Afficher et selectionner le Terrain source"))
             {
                 if (terrainMesh.sourceTerrain != null)
                 {
-                    Undo.RecordObject(terrainMesh.sourceTerrain, "Afficher le Terrain source");
-                    terrainMesh.sourceTerrain.drawHeightmap = true;
-                    EditorUtility.SetDirty(terrainMesh.sourceTerrain);
+                    LowPolyTerrainTrees.SetPreview(terrainMesh, true);
+                    Selection.activeGameObject = terrainMesh.sourceTerrain.gameObject;
+                    SceneView.RepaintAll();
                 }
             }
         }

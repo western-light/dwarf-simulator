@@ -29,7 +29,7 @@ namespace DwarfSimulator.LowPolyWorld
     {
         [Header("Source non destructive")]
         public Terrain sourceTerrain;
-        [Tooltip("Masque uniquement le rendu du Terrain Unity. Sa heightmap reste editable et sert aux routes.")]
+        [Tooltip("Affiche le terrain low-poly et recale les arbres peints sur ses facettes. Le Terrain Unity reste editable.")]
         public bool hideSourceRendering = true;
 
         [Header("Geometrie")]
@@ -61,6 +61,11 @@ namespace DwarfSimulator.LowPolyWorld
         [HideInInspector] public MeshRenderer meshRenderer;
         [HideInInspector] public MeshCollider meshCollider;
         [HideInInspector] public string generatedMeshGuid;
+        [HideInInspector] public GameObject generatedTrees;
+        [HideInInspector] public Terrain previewSource;
+        [HideInInspector] public float sourceTreeDistance;
+        [HideInInspector] public bool sourceTreeColliders;
+        [HideInInspector] public bool sourceColliderEnabled;
 
         private void Reset()
         {
