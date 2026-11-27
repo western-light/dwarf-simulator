@@ -14,10 +14,19 @@ namespace DwarfSimulator.Car
         {
             public PlayerID? Top;
             public PlayerID? Bottom;
+            public PlayerID? SwapRequester;
+
+            public bool IsSwap(PlayerID player, bool onTop)
+            {
+                PlayerID? destination = onTop ? Top : Bottom;
+                PlayerID? source = onTop ? Bottom : Top;
+                return destination.HasValue && destination != player && source == player;
+            }
 
             public bool TryAssign(PlayerID player, bool onTop, out SeatAssignments result)
             {
                 result = this;
+                result.SwapRequester = null;
                 PlayerID? destination = onTop ? Top : Bottom;
                 PlayerID? source = onTop ? Bottom : Top;
                 if (destination == player || (destination.HasValue && source != player))
@@ -42,6 +51,8 @@ namespace DwarfSimulator.Car
         [SerializeField] private Transform top;
         [SerializeField] private Transform bottom;
         [SerializeField] private float exitDistance = 2.2f;
+        [SerializeField, Min(1f)] private float blackoutSeconds = 90f;
+        [SerializeField, Min(1f)] private float recoverySeconds = 30f;
 
         private readonly SyncVar<SeatAssignments> _seats = new();
         private SyncVar<float> _steer = new();
@@ -156,10 +167,14 @@ namespace DwarfSimulator.Car
             if (choiceIndex < 0 || choiceIndex > 1 || player == null || !player.owner.HasValue)
                 return defaultName;
             SeatAssignments seats = _seats.value;
-            PlayerID? destination = choiceIndex == 0 ? seats.Top : seats.Bottom;
-            PlayerID? source = choiceIndex == 0 ? seats.Bottom : seats.Top;
-            return destination.HasValue && source == player.owner
-                ? $"{defaultName} (echanger)" : defaultName;
+            PlayerID self = player.owner.Value;
+            if (!seats.IsSwap(self, choiceIndex == 0))
+                return defaultName;
+            if (seats.SwapRequester == self)
+                return $"{defaultName} (annuler la demande d'echange)";
+            if (seats.SwapRequester.HasValue)
+                return $"{defaultName} (accepter l'echange)";
+            return $"{defaultName} (proposer d'echanger)";
         }
 
         private void OnAssignmentsChanged(SeatAssignments seats)
@@ -219,7 +234,10 @@ namespace DwarfSimulator.Car
                 changed = true;
             }
             if (changed)
+            {
+                seats.SwapRequester = null;
                 _seats.value = seats;
+            }
         }
 
         private void OnSeatChanged(Player.Player oldPlayer, Player.Player newPlayer, Transform seat)
@@ -228,13 +246,19 @@ namespace DwarfSimulator.Car
             {
                 oldPlayer.GetOut(transform.position - transform.right * exitDistance + Vector3.up * 0.5f,
                     Quaternion.Euler(0f, transform.eulerAngles.y, 0f));
-                if (oldPlayer.isOwner && oldPlayer.TryGetComponent(out Player.CameraSync oldCamera))
-                    oldCamera.UnlockView();
+                if (oldPlayer.isOwner)
+                {
+                    DriverVision.SetDriving(false, blackoutSeconds, recoverySeconds);
+                    if (oldPlayer.TryGetComponent(out Player.CameraSync oldCamera))
+                        oldCamera.UnlockView();
+                }
             }
 
             if (newPlayer != null)
             {
                 newPlayer.SitIn(seat, GetComponent<Interactable>(), seat == top ? "Direction" : "Pedales");
+                if (newPlayer.isOwner)
+                    DriverVision.SetDriving(seat == top, blackoutSeconds, recoverySeconds);
                 if (newPlayer.isOwner && newPlayer.TryGetComponent(out Player.CameraSync newCamera))
                 {
                     if (seat == bottom)
@@ -265,6 +289,24 @@ namespace DwarfSimulator.Car
             {
                 SeatRequestFailed(info.sender, "Place occupee ou deja selectionnee");
                 return;
+            }
+            if (seats.IsSwap(info.sender, onTop))
+            {
+                PlayerID other = (onTop ? seats.Top : seats.Bottom).Value;
+                if (seats.SwapRequester != other)
+                {
+                    bool cancelling = seats.SwapRequester == info.sender;
+                    seats.SwapRequester = cancelling ? null : info.sender;
+                    _seats.value = seats;
+                    if (cancelling)
+                    {
+                        SeatRequestFailed(info.sender, "Demande d'echange annulee");
+                        return;
+                    }
+                    SeatRequestFailed(info.sender, "Demande d'echange envoyee");
+                    SeatRequestFailed(other, "L'autre joueur propose d'echanger de place");
+                    return;
+                }
             }
             bool alreadySeatedHere = seats.Top == info.sender || seats.Bottom == info.sender;
             if (!alreadySeatedHere)
@@ -333,6 +375,7 @@ namespace DwarfSimulator.Car
                 seats.Bottom = null;
             else
                 return;
+            seats.SwapRequester = null;
             _seats.value = seats;
         }
 

@@ -194,6 +194,26 @@ namespace DwarfSimulator.Tests
         }
 
         [Test]
+        public void SwapIsDetectedOnlyForSeatedPlayerTargetingOccupiedSeat()
+        {
+            var seats = new CarPlace.SeatAssignments { Top = _first, Bottom = _second };
+            Assert.IsTrue(seats.IsSwap(_first, false));
+            Assert.IsTrue(seats.IsSwap(_second, true));
+            Assert.IsFalse(seats.IsSwap(_first, true));
+            Assert.IsFalse(seats.IsSwap(_outsider, true));
+            var single = new CarPlace.SeatAssignments { Top = _first };
+            Assert.IsFalse(single.IsSwap(_first, false));
+        }
+
+        [Test]
+        public void SuccessfulAssignmentClearsPendingSwapRequest()
+        {
+            var seats = new CarPlace.SeatAssignments { Top = _first, Bottom = _second, SwapRequester = _first };
+            Assert.IsTrue(seats.TryAssign(_second, true, out var swapped));
+            Assert.IsNull(swapped.SwapRequester);
+        }
+
+        [Test]
         public void EmptySeatChangeAndOutsideEntryPreserveOtherOccupant()
         {
             var seats = new CarPlace.SeatAssignments { Top = _first };
