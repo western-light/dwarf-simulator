@@ -36,6 +36,9 @@ namespace DwarfSimulator.Player
         [SerializeField, Range(0f, 8f)] private float upperBodySway = 2.5f;
         [SerializeField, Range(0f, 30f)] private float turnCounterRotation = 12f;
 
+        [Header("Seated limbs")]
+        [SerializeField, Min(1f)] private float armStretchLimit = 12f;
+
         [Header("Ground")]
         [SerializeField] private float groundCheckDistance = 0.35f;
         [SerializeField, Range(1f, 30f)] private float slopeFittingSpeed = 8f;
@@ -91,6 +94,22 @@ namespace DwarfSimulator.Player
                 };
             }
         }
+
+        private sealed class LimbIk
+        {
+            public Transform Target;
+            public Quaternion TargetRest;
+            public float Weight;
+            public bool ScaleCaptured;
+            public Vector3 RootScale;
+            public Vector3 EndScale;
+        }
+
+        private readonly LimbIk _lHandIk = new LimbIk();
+        private readonly LimbIk _rHandIk = new LimbIk();
+        private readonly LimbIk _lFootIk = new LimbIk();
+        private readonly LimbIk _rFootIk = new LimbIk();
+        private Transform _lHand, _rHand;
 
         private Player _player;
         private PlayerMouvement _movement;
@@ -279,9 +298,28 @@ namespace DwarfSimulator.Player
             _lForeArm = Get("LowerArm.L");
             _rForeArm = Get("LowerArm.R");
             _bones.Sort((a, b) => a.Depth.CompareTo(b.Depth));
+            byName.TryGetValue("Hand.L", out _lHand);
+            byName.TryGetValue("Hand.R", out _rHand);
         }
 
         public void PlayInteract() => _interactTime = 0f;
+
+        public void SetLimbTargets(Transform leftHand, Transform rightHand, Transform leftFoot, Transform rightFoot)
+        {
+            AssignLimb(_lHandIk, leftHand);
+            AssignLimb(_rHandIk, rightHand);
+            AssignLimb(_lFootIk, leftFoot);
+            AssignLimb(_rFootIk, rightFoot);
+        }
+
+        private static void AssignLimb(LimbIk limb, Transform target)
+        {
+            if (limb.Target == target)
+                return;
+            limb.Target = target;
+            limb.TargetRest = target != null ? target.localRotation : Quaternion.identity;
+            limb.Weight = 0f;
+        }
 
         private void LateUpdate()
         {
@@ -315,7 +353,120 @@ namespace DwarfSimulator.Player
             ApplyInteract(ref pose, dt);
             ApplyLanding(ref pose);
             Apply(pose);
+            ApplyLimbIk(dt);
             ApplyRecovery(dt);
+        }
+
+        private void ApplyLimbIk(float dt)
+        {
+            float blend = 1f - Mathf.Exp(-10f * dt);
+            bool seated = _player != null && _player.IsSeated;
+            StepLimbWeight(_lHandIk, seated, blend);
+            StepLimbWeight(_rHandIk, seated, blend);
+            StepLimbWeight(_lFootIk, seated, blend);
+            StepLimbWeight(_rFootIk, seated, blend);
+
+            Quaternion frame = _model.rotation * Quaternion.Inverse(_modelRestRotation);
+            Vector3 right = frame * Vector3.right;
+            Vector3 up = frame * Vector3.up;
+            Vector3 fwd = frame * Vector3.forward;
+
+            SolveLimb(_lHandIk, _lArm, _lForeArm, _lHand, -up * 0.8f - right * 0.7f - fwd * 0.3f, false, armStretchLimit);
+            SolveLimb(_rHandIk, _rArm, _rForeArm, _rHand, -up * 0.8f + right * 0.7f - fwd * 0.3f, false, armStretchLimit);
+            SolveLimb(_lFootIk, _lUpLeg, _lLowLeg, _lFoot?.T, fwd + up * 0.2f - right * 0.15f, true, 1f);
+            SolveLimb(_rFootIk, _rUpLeg, _rLowLeg, _rFoot?.T, fwd + up * 0.2f + right * 0.15f, true, 1f);
+        }
+
+        private void StepLimbWeight(LimbIk limb, bool seated, float blend)
+        {
+            float goal = seated && limb.Target != null ? 1f : 0f;
+            limb.Weight = limb.Target == null ? 0f : Mathf.Lerp(limb.Weight, goal, blend);
+        }
+
+        private void SolveLimb(LimbIk limb, Bone root, Bone mid, Transform end, Vector3 pole, bool matchTargetTilt,
+            float stretchLimit)
+        {
+            if (root == null || mid == null || end == null)
+                return;
+
+            if (!limb.ScaleCaptured)
+            {
+                limb.ScaleCaptured = true;
+                limb.RootScale = root.T.localScale;
+                limb.EndScale = end.localScale;
+            }
+            root.T.localScale = limb.RootScale;
+            end.localScale = limb.EndScale;
+
+            float weight = limb.Weight * _seatBlend;
+            if (weight < 0.001f)
+                return;
+
+            Quaternion endRotation = end.rotation;
+            float stretch = SolveTwoBone(root.T, mid.T, end, limb.Target.position, pole, weight, stretchLimit);
+            if (stretch > 1.0001f)
+            {
+                Vector3 rootScale = limb.RootScale;
+                Vector3 endScale = limb.EndScale;
+                root.T.localScale = new Vector3(rootScale.x, rootScale.y * stretch, rootScale.z);
+                end.localScale = new Vector3(endScale.x, endScale.y / stretch, endScale.z);
+            }
+            if (!matchTargetTilt)
+                return;
+
+            Transform parent = limb.Target.parent;
+            Quaternion parentRotation = parent != null ? parent.rotation : Quaternion.identity;
+            Quaternion tilt = parentRotation * limb.Target.localRotation * Quaternion.Inverse(limb.TargetRest) *
+                              Quaternion.Inverse(parentRotation);
+            end.rotation = Quaternion.Slerp(endRotation, tilt * endRotation, weight);
+        }
+
+        private static float SolveTwoBone(Transform root, Transform mid, Transform end, Vector3 target,
+            Vector3 pole, float weight, float stretchLimit)
+        {
+            Vector3 a = root.position;
+            Vector3 b = mid.position;
+            Vector3 c = end.position;
+            float upper = Vector3.Distance(a, b);
+            float lower = Vector3.Distance(b, c);
+            Vector3 toTarget = target - a;
+            if (upper < 1e-4f || lower < 1e-4f || toTarget.sqrMagnitude < 1e-8f)
+                return 1f;
+
+            float stretch = 1f;
+            if (stretchLimit > 1f)
+                stretch = Mathf.Clamp(toTarget.magnitude / (upper + lower), 1f, stretchLimit);
+            upper *= stretch;
+            lower *= stretch;
+
+            Quaternion rootStart = root.rotation;
+            Quaternion midStart = mid.rotation;
+            Quaternion endStart = end.rotation;
+
+            float distance = Mathf.Clamp(toTarget.magnitude, Mathf.Abs(upper - lower) + 1e-3f,
+                (upper + lower) * 0.9999f);
+            Vector3 direction = toTarget.normalized;
+            float cos = Mathf.Clamp((upper * upper + distance * distance - lower * lower) / (2f * upper * distance),
+                -1f, 1f);
+            float sin = Mathf.Sqrt(1f - cos * cos);
+            Vector3 side = Vector3.ProjectOnPlane(pole, direction);
+            if (side.sqrMagnitude < 1e-6f)
+                side = Vector3.ProjectOnPlane(b - a, direction);
+            side.Normalize();
+
+            Vector3 newMid = a + (direction * cos + side * sin) * upper;
+            Vector3 newEnd = a + direction * distance;
+
+            root.rotation = Quaternion.FromToRotation(b - a, newMid - a) * rootStart;
+            Vector3 midToEnd = end.position - mid.position;
+            mid.rotation = Quaternion.FromToRotation(midToEnd, newEnd - newMid) * mid.rotation;
+
+            Quaternion rootSolved = root.rotation;
+            Quaternion midSolved = mid.rotation;
+            root.rotation = Quaternion.Slerp(rootStart, rootSolved, weight);
+            mid.rotation = Quaternion.Slerp(midStart, midSolved, weight);
+            end.rotation = endStart;
+            return Mathf.Lerp(1f, stretch, weight);
         }
 
         private const float SampleWindow = 0.05f;

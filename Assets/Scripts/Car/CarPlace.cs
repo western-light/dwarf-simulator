@@ -56,12 +56,15 @@ namespace DwarfSimulator.Car
 
         private readonly SyncVar<SeatAssignments> _seats = new();
         private SyncVar<float> _steer = new();
+        private readonly SyncVar<float> _throttle = new();
+        private readonly SyncVar<float> _brake = new();
 
         private Player.Player _topPlayer;
         private Player.Player _bottomPlayer;
         private bool _inputNeedsSending = true;
         private CarControllerBase _car;
         private PlayerCarControl _driver;
+        private CarCockpit _cockpit;
         private InputAction _leaveAction;
         private (float steer, float throttle, float brake) _lastInput;
 
@@ -71,6 +74,9 @@ namespace DwarfSimulator.Car
             if (!TryGetComponent(out _driver))
                 _driver = gameObject.AddComponent<PlayerCarControl>();
             _driver.UseRemoteInput = true;
+            if (!TryGetComponent(out _cockpit))
+                _cockpit = gameObject.AddComponent<CarCockpit>();
+            _cockpit.Build(bottom);
         }
 
         protected override void OnSpawned()
@@ -100,13 +106,27 @@ namespace DwarfSimulator.Car
                 return;
 
             ReconcileSeats();
+            float visualSteer;
+            float visualThrottle;
+            float visualBrake;
             if (isServer)
             {
                 RemoveDisconnectedPlayers();
-                _steer.value = _car.SteerInput;
+                visualSteer = _car.SteerInput;
+                visualThrottle = _driver.RemoteThrottle;
+                visualBrake = _driver.RemoteBrake;
+                _steer.value = visualSteer;
+                _throttle.value = visualThrottle;
+                _brake.value = visualBrake;
             }
             else
+            {
+                visualSteer = _steer.value;
+                visualThrottle = _throttle.value;
+                visualBrake = _brake.value;
                 TurnWheels();
+            }
+            _cockpit.SetInputs(visualSteer, visualThrottle, visualBrake);
 
             bool onTop = _topPlayer != null && _topPlayer.isOwner;
             bool onBottom = _bottomPlayer != null && _bottomPlayer.isOwner;
@@ -257,6 +277,10 @@ namespace DwarfSimulator.Car
             if (newPlayer != null)
             {
                 newPlayer.SitIn(seat, GetComponent<Interactable>(), seat == top ? "Direction" : "Pedales");
+                if (seat == top)
+                    newPlayer.SetLimbTargets(_cockpit.LeftGrip, _cockpit.RightGrip, null, null);
+                else
+                    newPlayer.SetLimbTargets(null, null, _cockpit.BrakeFoot, _cockpit.ThrottleFoot);
                 if (newPlayer.isOwner)
                     DriverVision.SetDriving(seat == top, blackoutSeconds, recoverySeconds);
                 if (newPlayer.isOwner && newPlayer.TryGetComponent(out Player.CameraSync newCamera))

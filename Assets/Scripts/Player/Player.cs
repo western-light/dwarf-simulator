@@ -79,8 +79,14 @@ namespace DwarfSimulator.Player
             FollowSeat();
         }
 
+        public void SetLimbTargets(Transform leftHand, Transform rightHand, Transform leftFoot, Transform rightFoot)
+        {
+            _avatar.SetLimbTargets(leftHand, rightHand, leftFoot, rightFoot);
+        }
+
         public void GetOut(Vector3 position, Quaternion rotation)
         {
+            _avatar.SetLimbTargets(null, null, null, null);
             Seat = null;
             SeatInteractable = null;
             SeatDescription = null;

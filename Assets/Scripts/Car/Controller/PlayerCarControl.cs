@@ -104,6 +104,9 @@ namespace DwarfSimulator.Car.Controller
             _remoteBrake = Mathf.Clamp01(brake);
         }
 
+        public float RemoteThrottle => _remoteThrottle;
+        public float RemoteBrake => _remoteBrake;
+
         public float ReadSteerInput() => GetLocalSteerInput();
         public float ReadThrottleInput() => GetLocalThrottleInput();
         public float ReadBrakeInput() => GetLocalBrakeInput();
